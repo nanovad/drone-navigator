@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "DroneNavigator (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "DroneNavigator (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}
