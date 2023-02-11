@@ -14,6 +14,17 @@ namespace FlightDataModel
         public DbSet<MissionModel> Missions { get; set; }
         public DbSet<CommandModel> Commands { get; set; }
         public DbSet<FlightState> FlightStates { get; set; }
+
+        public string DbPath { get; }
+
+        public FlightDataContext()
+        {
+            string localAppDataPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+            DbPath = System.IO.Path.Join(localAppDataPath, "DroneNavigator.db");
+        }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) =>
+            optionsBuilder.UseSqlite($"Data Source={DbPath}");
     }
 
     internal class DroneModel
