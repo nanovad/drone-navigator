@@ -10,16 +10,6 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:cdi="using:CDI"
     mc:Ignorable="d">
 
-    <SplitView x:Name="MainContentSplit" IsPaneOpen="true" PanePlacement="Right" >
-        <SplitView.Pane>
-            <Grid Margin="8">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                </Grid.RowDefinitions>
-                <TextBlock x:Name="TextBlock1" Text="asdfqwerty" Grid.Row="0"></TextBlock>
-                <TextBlock x:Name="TextBlock2" Text="umopapisdn" Grid.Row="1"></TextBlock>
-            </Grid>
-        </SplitView.Pane>
-    </SplitView>
+    <cdi:CDI></cdi:CDI>
+
 </Window>
