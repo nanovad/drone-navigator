@@ -17,7 +17,7 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
-                <TextBlock x:Name="TextBlock1" Text="asdfqwerty" Grid.Row="0"></TextBlock>
+                <TextBlock x:Name="MetTextBlock" Text="MET: " Grid.Row="0"></TextBlock>
                 <TextBlock x:Name="TextBlock2" Text="umopapisdn" Grid.Row="1"></TextBlock>
             </Grid>
         </SplitView.Pane>

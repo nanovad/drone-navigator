@@ -16,6 +16,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\FlightDataModel\FlightDataModel.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Page Update="CDI.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
+using FlightDataModel;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
@@ -13,6 +14,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Text;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 
@@ -23,9 +25,30 @@ namespace CDI
 {
     public sealed partial class CDI : UserControl
     {
+        internal FlightStatusController Fsc;
+
+        private FlightStateModel CurFlightState { get { return Fsc.CurrentState; } }
+
         public CDI()
         {
             this.InitializeComponent();
+            Fsc = new FlightStatusController(FlightStatusChangedEventHandler);
+            // Mock fire the event handler to initialize the UI values
+            FlightStatusChangedEventHandler(null, null);
+        }
+
+        private void FlightStatusChangedEventHandler(object Sender, EventArgs e)
+        {
+            RefreshMet();
+        }
+
+        void RefreshMet()
+        {
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.Append("MET: ");
+            stringBuilder.Append(TimeSpan.FromMilliseconds(CurFlightState.Met).ToString("c"));
+            this.MetTextBlock.Text = stringBuilder.ToString();
         }
     }
 }
+

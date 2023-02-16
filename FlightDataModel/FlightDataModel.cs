@@ -8,12 +8,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FlightDataModel
 {
-    internal class FlightDataContext : DbContext
+    public class FlightDataContext : DbContext
     {
         public DbSet<DroneModel> Drones { get; set; }
         public DbSet<MissionModel> Missions { get; set; }
         public DbSet<CommandModel> Commands { get; set; }
-        public DbSet<FlightState> FlightStates { get; set; }
+        public DbSet<FlightStateModel> FlightStates { get; set; }
 
         public string DbPath { get; }
 
@@ -27,7 +27,7 @@ namespace FlightDataModel
             optionsBuilder.UseSqlite($"Data Source={DbPath}");
     }
 
-    internal class DroneModel
+    public class DroneModel
     {
         public int Id { get; set; }
         public string Name { get; set; }
@@ -37,7 +37,7 @@ namespace FlightDataModel
         public int MissionCount { get; set; }
     }
 
-    internal class MissionModel
+    public class MissionModel
     {
         public int Id { get; set; }
         public int Drone { get; set; }
@@ -48,7 +48,7 @@ namespace FlightDataModel
         public float Distance { get; set; }
     }
 
-    internal class CommandModel
+    public class CommandModel
     {
         public int Id { get; set; }
         public int Mission { get; set; }
@@ -59,7 +59,7 @@ namespace FlightDataModel
         public bool ResponseWasError { get; set; }
     }
 
-    internal class FlightState
+    public class FlightStateModel
     {
         public int Id { get; set; }
         public int Mission { get; set; }
