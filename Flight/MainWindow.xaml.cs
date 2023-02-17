@@ -26,9 +26,22 @@ namespace Flight
     /// </summary>
     public sealed partial class MainWindow : Window
     {
+        private TelloApi api;
         public MainWindow()
         {
             this.InitializeComponent();
+            api = new();
+            api.StartConnection();
+        }
+
+        private void TakeoffButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            api.Takeoff();
+        }
+
+        private void LandButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            api.Land();
         }
     }
 }

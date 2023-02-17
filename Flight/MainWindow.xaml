@@ -10,6 +10,14 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:cdi="using:CDI"
     mc:Ignorable="d">
 
-    <cdi:CDI></cdi:CDI>
+    <!-- The main panel - command buttons above, CDI interface below. -->
+    <StackPanel Orientation="Vertical" x:Name="MainPanel">
+        <!-- The command buttons panel -->
+        <StackPanel Orientation="Horizontal" x:Name="CommandButtonsPanel">
+            <Button x:Name="TakeoffButton" Content="Take Off" Click="TakeoffButton_OnClick" />
+            <Button x:Name="LandButton" Content="Land" Click="LandButton_OnClick"></Button>
+        </StackPanel>
+        <cdi:CDI></cdi:CDI>
+    </StackPanel>
 
 </Window>
