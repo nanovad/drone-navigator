@@ -11,13 +11,15 @@
     mc:Ignorable="d">
 
     <!-- The main panel - command buttons above, CDI interface below. -->
-    <StackPanel Orientation="Vertical" x:Name="MainPanel">
+    <!-- We're using a Grid here because there is no DockPanel in WinUI3 (yet?) -->
+    <!-- The top row sizes itself as small as possible, and the main row (the CDI) fills the remaining space. -->
+    <Grid RowDefinitions="Auto, *">
         <!-- The command buttons panel -->
-        <StackPanel Orientation="Horizontal" x:Name="CommandButtonsPanel">
-            <Button x:Name="TakeoffButton" Content="Take Off" Click="TakeoffButton_OnClick" />
-            <Button x:Name="LandButton" Content="Land" Click="LandButton_OnClick"></Button>
+        <StackPanel Orientation="Horizontal" x:Name="CommandButtonsPanel" Grid.Row="0" Margin="5">
+            <Button x:Name="TakeoffButton" Content="Take Off" Click="TakeoffButton_OnClick" Margin="5"/>
+            <Button x:Name="LandButton" Content="Land" Click="LandButton_OnClick" Margin="5" />
         </StackPanel>
-        <cdi:CDI></cdi:CDI>
-    </StackPanel>
+        <cdi:CDI Grid.Row="1"></cdi:CDI>
+    </Grid>
 
 </Window>
