@@ -10,16 +10,54 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
-    <SplitView x:Name="MainContentSplit" IsPaneOpen="true" PanePlacement="Right" >
+    <SplitView x:Name="MainContentSplit" IsPaneOpen="true" DisplayMode="Inline" PanePlacement="Right" IsEnabled="False">
+        <!-- Pane area - flight parameters (MET, battery, signal, etc) -->
         <SplitView.Pane>
             <Grid Margin="8">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="200"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
+
+                <!-- Mission Elapsed Time row -->
                 <TextBlock x:Name="MetTextBlock" Text="MET: " Grid.Row="0"></TextBlock>
-                <TextBlock x:Name="TextBlock2" Text="umopapisdn" Grid.Row="1"></TextBlock>
+
+                <!-- Signal, battery, and battery life row -->
+                <StackPanel
+                    x:Name="SignalBatteryPanel"
+                    Grid.Row="1"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Left"
+                    Padding="8">
+                    <!-- See https://learn.microsoft.com/en-us/windows/apps/design/style/segoe-ui-symbol-font for -->
+                    <!-- a list of these glyphs. -->
+                    <!-- Signal icon - defaults to E871 (SignalNotConnected) -->
+                    <FontIcon x:Name="SignalIcon" Glyph="&#xE871;" FontSize="24pt" Margin="0,0,8,0"></FontIcon>
+                    <!-- Battery icon - defaults to E996 (BatteryUnknown) -->
+                    <FontIcon x:Name="BatteryIcon" Glyph="&#xE996;" FontSize="24pt" Margin="8,0,8,0"></FontIcon>
+                    <TextBlock x:Name="BatteryTextBlock" Margin="8">null</TextBlock>
+                </StackPanel>
+
+                <!-- CAVI - command, attitude and velocity indicator + total speed row -->
+                <StackPanel x:Name="CvaSpeedPanel" Orientation="Horizontal" Grid.Row="2">
+                    <!-- [placeholder for CAVI control] -->
+                    <TextBlock x:Name="SpeedTextBlock">0.00MPH</TextBlock>
+                </StackPanel>
+
+                <TextBlock x:Name="TotalDistanceTextBlock" Grid.Row="3">Total distance: </TextBlock>
+
+                <TextBlock x:Name="AltitudeTextBlock" Grid.Row="4">Altitude: </TextBlock>
+
+                <!-- Placeholder for warning indicator control -->
             </Grid>
         </SplitView.Pane>
+        <!-- Main content area - video from the drone -->
+        <SplitView.Content>
+            <MediaPlayerElement x:Name="DroneVideoPlayer"></MediaPlayerElement>
+        </SplitView.Content>
     </SplitView>
 </UserControl>
