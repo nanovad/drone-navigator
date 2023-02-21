@@ -19,7 +19,7 @@
             <Button x:Name="TakeoffButton" Content="Take Off" Click="TakeoffButton_OnClick" Margin="5"/>
             <Button x:Name="LandButton" Content="Land" Click="LandButton_OnClick" Margin="5" />
         </StackPanel>
-        <cdi:CDI Grid.Row="1"></cdi:CDI>
+        <cdi:CDI x:Name="Cdi" Grid.Row="1"></cdi:CDI>
     </Grid>
 
 </Window>
