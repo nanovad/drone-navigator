@@ -10,10 +10,8 @@ using Microsoft.EntityFrameworkCore.Sqlite.Query.Internal;
 
 namespace CDI
 {
-    internal class FlightStatusController
+    internal class FlightStatusController : IFlightStatusProvider
     {
-        public event EventHandler OnChanged;
-
         private FlightStateModel PreviousState;
         private FlightStateModel currentState;
         public FlightStateModel CurrentState { get { return currentState; } }
@@ -24,11 +22,21 @@ namespace CDI
 
         private FlightDataContext Context;
 
-        public FlightStatusController(EventHandler ChangedHandler)
+        public event IFlightStatusProvider.OnFlightStatusChangedHandler OnFlightStatusChanged;
+
+        public FlightStatusController(IFlightStatusProvider subProvider)
         {
-            OnChanged += ChangedHandler;
             Context = new FlightDataContext();
             currentState = new FlightStateModel();
+
+            // Hook ourselves into the sub-provider's callback, and propagate any updates from it to any handlers
+            // registered to us.
+            subProvider.OnFlightStatusChanged += SubProvider_OnFlightStatusChanged;
+        }
+
+        private void SubProvider_OnFlightStatusChanged(object sender, FlightStatusChangedEventArgs e)
+        {
+            UpdateState(e.FlightState);
         }
 
         public void InitializeMission(MissionModel Mission)
@@ -40,7 +48,7 @@ namespace CDI
         {
             PreviousState = CurrentState;
             currentState = NewState;
-            OnChanged(this, EventArgs.Empty);
+            OnFlightStatusChanged?.Invoke(this, new FlightStatusChangedEventArgs(currentState));
         }
     }
 }

@@ -26,12 +26,16 @@ namespace Flight
     /// </summary>
     public sealed partial class MainWindow : Window
     {
+        // Cdi is declared in XAML.
+
         private TelloApi api;
+
         public MainWindow()
         {
             this.InitializeComponent();
             api = new();
             api.StartConnection();
+            Cdi.StatusProvider = api;
         }
 
         private void TakeoffButton_OnClick(object sender, RoutedEventArgs e)

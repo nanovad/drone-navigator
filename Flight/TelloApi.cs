@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
+using CDI;
 using FlightDataModel;
 
 namespace Flight
@@ -175,8 +176,10 @@ namespace Flight
         }
     }
 
-    internal class TelloApi
+    internal class TelloApi : IFlightStatusProvider
     {
+        public event IFlightStatusProvider.OnFlightStatusChangedHandler OnFlightStatusChanged;
+
         private const int CommandResponsePort = 8889;
         private const int VideoStreamPort = 11111;
 
@@ -203,6 +206,7 @@ namespace Flight
         internal void StateUpdatedCallback(FlightStateModel newState)
         {
             currentState = newState;
+            OnFlightStatusChanged?.Invoke(this, new FlightStatusChangedEventArgs(currentState));
         }
 
         /// <summary>
