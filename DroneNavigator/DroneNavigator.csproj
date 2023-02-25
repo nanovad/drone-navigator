@@ -12,6 +12,9 @@
     <EnableMsixTooling>true</EnableMsixTooling>
     <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
   </PropertyGroup>
+  <ItemGroup>
+    <None Remove="StartNewMissionDialog.xaml" />
+  </ItemGroup>
 
   <ItemGroup>
     <Content Include="Assets\SplashScreen.scale-200.png" />
@@ -44,6 +47,14 @@
   <ItemGroup>
     <ProjectReference Include="..\FlightDataModel\FlightDataModel.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Themes\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="StartNewMissionDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
 
   <!-- 
     Defining the "HasPackageAndPublishMenuAddedByProject" property here allows the Solution 
@@ -57,12 +68,10 @@
   <Target Name="RemoveCollidingDepsJson" AfterTargets="GetPackagingOutputs" BeforeTargets="_ComputeAppxPackagePayload">
     <!-- If conflicting build and publish deps.json files are present, use only the publish deps.json, 
           and remove the corresponding build deps.json. -->
-    <ItemGroup Condition="'@(PackagingOutputs)'!=''" >
-      <_PublishDepsJson Include="@(PackagingOutputs->WithMetadataValue('OutputGroup', 'PublishItemsOutputGroupOutput'))"
-          Condition="$([System.String]::Copy('%(FileName)%(Extension)').EndsWith('.deps.json'))" />
-      <_BuildDepsJson Include="@(PackagingOutputs->WithMetadataValue('OutputGroup', 'GetCopyToOutputDirectoryItemsOutputGroup'))"
-          Condition="$([System.String]::Copy('%(FileName)%(Extension)').EndsWith('.deps.json'))" />
-      <PackagingOutputs Condition="'@(_PublishDepsJson)'!='' and '@(_BuildDepsJson)'!=''" Remove="@(_BuildDepsJson)"/>
+    <ItemGroup Condition="'@(PackagingOutputs)'!=''">
+      <_PublishDepsJson Include="@(PackagingOutputs-&gt;WithMetadataValue('OutputGroup', 'PublishItemsOutputGroupOutput'))" Condition="$([System.String]::Copy('%(FileName)%(Extension)').EndsWith('.deps.json'))" />
+      <_BuildDepsJson Include="@(PackagingOutputs-&gt;WithMetadataValue('OutputGroup', 'GetCopyToOutputDirectoryItemsOutputGroup'))" Condition="$([System.String]::Copy('%(FileName)%(Extension)').EndsWith('.deps.json'))" />
+      <PackagingOutputs Condition="'@(_PublishDepsJson)'!='' and '@(_BuildDepsJson)'!=''" Remove="@(_BuildDepsJson)" />
     </ItemGroup>
   </Target>
 </Project>
