@@ -11,6 +11,7 @@
     <UseWinUI>true</UseWinUI>
     <EnableMsixTooling>true</EnableMsixTooling>
     <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
+    <StartupObject></StartupObject>
   </PropertyGroup>
   <ItemGroup>
     <None Remove="StartNewMissionDialog.xaml" />
@@ -46,6 +47,8 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FlightDataModel\FlightDataModel.csproj" />
+    <ProjectReference Include="..\Flight\Flight.csproj" />
+    <ProjectReference Include="..\Review\Review.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Themes\" />
