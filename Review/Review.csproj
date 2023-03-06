@@ -12,6 +12,7 @@
     <EnableMsixTooling>true</EnableMsixTooling>
     <!--<WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>-->
     <IsPublishable>False</IsPublishable>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>

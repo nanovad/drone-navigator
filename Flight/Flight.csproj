@@ -13,6 +13,7 @@
     <!--<WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>-->
     <IsPublishable>False</IsPublishable>
     <StartupObject></StartupObject>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
