@@ -30,6 +30,23 @@ namespace DroneNavigator
         public string MissionName => MissionNameTextBox.Text;
         public string MissionDescription => MissionDescTextBox.Text;
         public int? DroneId => (DroneComboBox.SelectionBoxItem as DroneModel)?.Id;
+        public string ErrorMessage {
+            get {
+                return ErrorMessageTextBox.Text;
+            }
+            set {
+                ErrorMessageTextBox.Text = value;
+                if(String.IsNullOrEmpty(value)) {
+                    // If there is no error message, collapse the control
+                    // (i.e., make it invisible)
+                    ErrorMessageTextBox.Visibility = Visibility.Collapsed;
+                }
+                else {
+                    // If there is an error message, show the control.
+                    ErrorMessageTextBox.Visibility = Visibility.Visible;
+                }
+            }
+        }
 
         public StartNewMissionDialog()
         {

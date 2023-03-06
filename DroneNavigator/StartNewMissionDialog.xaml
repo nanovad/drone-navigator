@@ -17,10 +17,14 @@
             <RowDefinition Height="Auto"></RowDefinition>
             <RowDefinition Height="Auto"></RowDefinition>
             <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
         </Grid.RowDefinitions>
         <TextBlock Grid.Row="0" Margin="4">Drone</TextBlock>
         <ComboBox x:Name="DroneComboBox" Grid.Row="1" Margin="4"></ComboBox>
         <TextBox x:Name="MissionNameTextBox"  Grid.Row="2" Margin="4" Header="Mission Name"></TextBox>
         <TextBox x:Name="MissionDescTextBox" Grid.Row="3" Margin="4" Header="Mission Description"></TextBox>
+        <TextBlock x:Name="ErrorMessageTextBox" Grid.Row="4" Margin="4,12,4,4"
+                   FontStyle="Italic" Foreground="Red" Visibility="Collapsed">
+        </TextBlock>
     </Grid>
 </Page>

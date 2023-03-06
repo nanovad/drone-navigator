@@ -61,17 +61,53 @@ namespace DroneNavigator
         private async void StartNewMissionButton_OnClick(object sender, RoutedEventArgs e)
         {
             // Spawn the "Start new mission" dialog.
+            StartNewMissionDialog snmd = new();
             ContentDialog cd = new();
             cd.XamlRoot = this.Content.XamlRoot;
-            cd.Content = new StartNewMissionDialog();
+            cd.Content = snmd;
             cd.PrimaryButtonText = "Start";
             cd.CloseButtonText = "Cancel";
+            cd.PrimaryButtonClick += delegate(ContentDialog sender, ContentDialogButtonClickEventArgs args)
+            {
+                // TODO: Validate snmd.DroneId?
+                if(String.IsNullOrEmpty(snmd.MissionName)) {
+                    snmd.ErrorMessage = "Must enter a mission name";
+                    args.Cancel = true;
+                }
+                else if(String.IsNullOrEmpty(snmd.MissionDescription)) {
+                    snmd.ErrorMessage = "Must enter a mission description";
+                    args.Cancel = true;
+                }
+            };
             ContentDialogResult result = await cd.ShowAsync();
 
             if (result == ContentDialogResult.Primary)
             {
-                // Now cast (cd.Content as StartNewMissionDialog).<field> to access the fields from the dialog.
-                // Save the mission to the DB and spawn a new Flight window that will target the newly created mission.
+                // Commit the mission (as defined by the dialog's textboxes) to the DB
+                MissionModel newMission = new()
+                {
+                    Drone = snmd.DroneId ?? 0, // BUG: Can't have a 0 DroneId, probably a recipe for breakage
+                    Name = snmd.MissionName,
+                    Description = snmd.MissionDescription,
+                    StartDateTimeOffset = DateTimeOffset.Now
+                };
+                fdc.Missions.Add(newMission);
+                fdc.SaveChanges();
+
+                // EF Core will have generated an ID for newMission at this point, so we can use it here.
+                // Begin initializing a new Flight window
+                Flight.MainWindow flightWindow = new();
+                flightWindow.Mission = newMission;
+                // Close our window - we're about to swap to the Flight interface
+                this.Close();
+
+                flightWindow.Activate();
+                flightWindow.Closed += delegate
+                {
+                    // When the Flight interface closes, spawn a new landing page
+                    MainWindow newMain = new();
+                    newMain.Activate();
+                };
             }
         }
     }
