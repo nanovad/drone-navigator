@@ -18,6 +18,8 @@ using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Microsoft.UI.Dispatching;
+using Windows.Media.Core;
+using Windows.Media.Playback;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -31,11 +33,11 @@ namespace Flight
     {
         // Cdi is declared in XAML.
 
-        private TelloApi api;
+        private readonly TelloApi api;
 
-        private DispatcherQueue _dq = DispatcherQueue.GetForCurrentThread();
+        private readonly DispatcherQueue _dq = DispatcherQueue.GetForCurrentThread();
 
-        private FlightDataContext _fdc = new FlightDataContext();
+        private readonly FlightDataContext _fdc = new();
         public MissionModel? Mission;
 
         public MainWindow()
@@ -43,6 +45,11 @@ namespace Flight
             this.InitializeComponent();
             api = new();
             Cdi.StatusProvider = api;
+
+            Cdi.DroneVideoElement.AutoPlay = true;
+            Cdi.DroneVideoElement.MediaPlayer.RealTimePlayback = true;
+            Cdi.DroneVideoElement.Source = new MediaPlaybackItem(
+                MediaSource.CreateFromMediaStreamSource(api.VideoReceiver.MediaStreamSource));
         }
 
         private void ConnectButton_OnClick(object sender, RoutedEventArgs e)
@@ -51,6 +58,12 @@ namespace Flight
             if(api.Connected) {
                 // Disconnect (sets the api.Connected property to false, plus performs the actual disconnection).
                 api.StopConnection();
+                // Stop the video stream.
+                api.StopVideo();
+
+                // Clear the last frame from the video player.
+                Cdi.DroneVideoElement.Source = null;
+
                 // Restore the button content.
                 ConnectButton.Content = "Connect";
                 return;
@@ -84,14 +97,18 @@ namespace Flight
                 {
                     api.StartConnection();
 
+                    api.StartVideo();
+
                     _dq.TryEnqueue(() => {
                         // If StartConnection() does not throw an exception, we can assume the connection succeeded.
                         ConnectButton.Content = "Disconnect"; 
                         ConnectButton.IsEnabled = true;
                         ConnectionFailedInfoBar.IsOpen = false;
+                        Cdi.DroneVideoElement.MediaPlayer.Play();
                     });
+
                 }
-                catch(TelloConnectionException _)
+                catch(TelloConnectionException)
                 {
                     // If StartConnection() did throw an exception, then we are not connected - reset the control to
                     // its original state and show the connection failure InfoBar.
@@ -115,6 +132,12 @@ namespace Flight
         {
             if(api.Connected)
                 api.Land();
+        }
+
+        private void MainWindow_OnClosed(object sender, WindowEventArgs args)
+        {
+            api.StopConnection();
+            api.StopVideo();
         }
     }
 }

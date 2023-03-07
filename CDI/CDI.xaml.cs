@@ -51,6 +51,8 @@ namespace CDI
 
         private FlightStateModel CurFlightState => Fsc.CurrentState;
 
+        public MediaPlayerElement DroneVideoElement => this.DroneVideoPlayer;
+
         public CDI()
         {
             this.InitializeComponent();

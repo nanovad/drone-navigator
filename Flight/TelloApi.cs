@@ -30,7 +30,7 @@ namespace Flight
 
         public event FlightStateChangedCallback FlightStateChanged;
 
-        private bool _quitting = false;
+        private volatile bool _quitting = false;
         public bool Connected = false;
 
         public TelloStateReceiver(IPEndPoint telloEndPoint, FlightStateChangedCallback updateCallback)
@@ -43,6 +43,7 @@ namespace Flight
         public void Quit()
         {
             _quitting = true;
+            Connected = false;
         }
 
         public void ConstantlyReceiveState()
@@ -186,11 +187,14 @@ namespace Flight
         private readonly TimeSpan _telloInitialStatePacketTimeout = TimeSpan.FromMilliseconds(10000);
 
         private IPEndPoint _telloEndPoint = IPEndPoint.Parse("192.168.10.1:8889");
+        public IPEndPoint TelloEndPoint => _telloEndPoint;
 
         private readonly UdpClient _commandResponseClient = new(CommandResponsePort);
-        private readonly UdpClient _videoStreamClient = new(VideoStreamPort);
+        //private readonly UdpClient _videoStreamClient = new(VideoStreamPort);
 
         private readonly TelloStateReceiver _telloStateReceiver;
+        private readonly TelloVideoReceiver _telloVideoReceiver;
+        public TelloVideoReceiver VideoReceiver => _telloVideoReceiver;
         private readonly Thread _stateThread;
 
         private FlightStateModel currentState;
@@ -203,6 +207,8 @@ namespace Flight
             _stateThread = new Thread(new ThreadStart(_telloStateReceiver.ConstantlyReceiveState));
             _stateThread.Start();
             _commandResponseClient.Connect(_telloEndPoint);
+
+            _telloVideoReceiver = new TelloVideoReceiver(VideoStreamPort);
         }
 
         internal void StateUpdatedCallback(FlightStateModel newState)
@@ -283,7 +289,7 @@ namespace Flight
         public void StopConnection()
         {
             // Stop expecting state packets.
-            _telloStateReceiver.Connected = false;
+            _telloStateReceiver.Quit();
             // Clear the current flight state.
             currentState = null;
         }
@@ -301,6 +307,18 @@ namespace Flight
         public CommandResponse Land()
         {
             return SendCommandAndWaitForResponse("land");
+        }
+
+        public CommandResponse StartVideo()
+        {
+            _telloVideoReceiver.Start();
+            return SendCommandAndWaitForResponse("streamon");
+        }
+
+        public CommandResponse StopVideo()
+        {
+            _telloVideoReceiver.Stop();
+            return SendCommandAndWaitForResponse("streamoff");
         }
     }
 }

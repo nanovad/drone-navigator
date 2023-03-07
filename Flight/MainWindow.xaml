@@ -8,7 +8,8 @@
     xmlns:local="using:Flight"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:cdi="using:CDI"
-    mc:Ignorable="d">
+    mc:Ignorable="d"
+    Closed="MainWindow_OnClosed">
 
     <!-- The main panel - command buttons above, CDI interface below. -->
     <!-- We're using a Grid here because there is no DockPanel in WinUI3 (yet?) -->
