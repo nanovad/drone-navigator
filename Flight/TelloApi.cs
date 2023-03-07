@@ -195,6 +195,8 @@ namespace Flight
 
         private FlightStateModel currentState;
 
+        public bool Connected => currentState != null;
+
         public TelloApi()
         {
             _telloStateReceiver = new TelloStateReceiver(_telloEndPoint, StateUpdatedCallback);

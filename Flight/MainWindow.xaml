@@ -13,13 +13,21 @@
     <!-- The main panel - command buttons above, CDI interface below. -->
     <!-- We're using a Grid here because there is no DockPanel in WinUI3 (yet?) -->
     <!-- The top row sizes itself as small as possible, and the main row (the CDI) fills the remaining space. -->
-    <Grid RowDefinitions="Auto, *">
+    <Grid RowDefinitions="Auto, Auto, *">
+        <!-- A normally hidden InfoBar that displays when an unsuccessful drone connection attempt is made. -->
+        <InfoBar x:Name="ConnectionFailedInfoBar"
+                 Title="Unable to connect to drone"
+                 Message="Could not connect to the drone. Please check your network connection and try again."
+                 Severity="Error"
+                 IsOpen="False"
+                 Grid.Row="0" />
         <!-- The command buttons panel -->
-        <StackPanel Orientation="Horizontal" x:Name="CommandButtonsPanel" Grid.Row="0" Margin="5">
-            <Button x:Name="TakeoffButton" Content="Take Off" Click="TakeoffButton_OnClick" Margin="5"/>
+        <StackPanel Orientation="Horizontal" x:Name="CommandButtonsPanel" Grid.Row="1" Margin="5">
+            <Button x:Name="ConnectButton" Content="Connect" Click="ConnectButton_OnClick" Margin="5" />
+            <Button x:Name="TakeoffButton" Content="Take Off" Click="TakeoffButton_OnClick" Margin="5" />
             <Button x:Name="LandButton" Content="Land" Click="LandButton_OnClick" Margin="5" />
         </StackPanel>
-        <cdi:CDI x:Name="Cdi" Grid.Row="1"></cdi:CDI>
+        <cdi:CDI x:Name="Cdi" Grid.Row="2"></cdi:CDI>
     </Grid>
 
 </Window>
