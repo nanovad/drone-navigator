@@ -28,7 +28,7 @@ namespace Flight
 
         private readonly Stopwatch _watch = new();
 
-        private readonly ConcurrentQueue<VideoSample> _samples = new();
+        private readonly ConcurrentQueue<MediaStreamSample> _samples = new();
 
         public TelloVideoReceiver(int telloVideoPort)
         {
@@ -52,10 +52,9 @@ namespace Flight
                 SpinWait.SpinUntil(() => !_samples.IsEmpty);
             }
 
-
-            if (_samples.TryDequeue(out VideoSample? videoSample))
+            if (_samples.TryDequeue(out MediaStreamSample? videoSample))
             {
-                args.Request.Sample = MediaStreamSample.CreateFromBuffer(videoSample.Raw.AsBuffer(), videoSample.Start);
+                args.Request.Sample = videoSample;
             }
         }
 
@@ -78,8 +77,8 @@ namespace Flight
                         continue;
                     }
 
-                    VideoSample vs = new(timeIndex, _watch.Elapsed - timeIndex, buf);
-                    _samples.Enqueue(vs);
+                    //VideoSample vs = new(timeIndex, _watch.Elapsed - timeIndex, buf);
+                    _samples.Enqueue(MediaStreamSample.CreateFromBuffer(buf.AsBuffer(), timeIndex));
                 }
                 catch
                 {
