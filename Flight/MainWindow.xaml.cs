@@ -20,6 +20,7 @@ using Windows.Foundation.Collections;
 using Microsoft.UI.Dispatching;
 using Windows.Media.Core;
 using Windows.Media.Playback;
+using Windows.Storage;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -39,6 +40,10 @@ namespace Flight
 
         private readonly FlightDataContext _fdc = new();
         public MissionModel? Mission;
+
+        private bool _missionVideoEncoded = false;
+
+        public event EventHandler? OnMissionVideoEncodingCompleted;
 
         public MainWindow()
         {
@@ -134,10 +139,41 @@ namespace Flight
                 api.Land();
         }
 
-        private void MainWindow_OnClosed(object sender, WindowEventArgs args)
+        private async void MainWindow_OnClosed(object sender, WindowEventArgs args)
         {
+            // Short circuit if we've already encoded the video. This handler actually gets called twice - once when
+            // the user initiates the window closing, and again when the OnEncodeCompleted callback is run.
+            // This boolean ensures that we actually close the window the second time around.
+            if(_missionVideoEncoded)
+                return;
             api.StopConnection();
             api.StopVideo();
+
+            // Prevents the window from automatically closing.
+            args.Handled = true;
+
+            MissionEncodingPage mep = new();
+            ContentDialog mepd = new ContentDialog();
+            mepd.XamlRoot = this.Content.XamlRoot;
+            mepd.Content = mep;
+            mepd.Title = "Please wait while the mission video is saved...";
+            mep.OnEncodeCompleted += (sender, args) => {
+                _missionVideoEncoded = true;
+                _dq.TryEnqueue(() => {
+                    mepd.Hide();
+                    OnMissionVideoEncodingCompleted?.Invoke(this, EventArgs.Empty);
+                    this.Close();
+                });
+            };
+
+            // Ensure our local app data folder (and video subfolder) is created.
+            Directory.CreateDirectory(MissionVideoManager.BaseVideoFolderPath);
+
+            if (!File.Exists(MissionVideoManager.TempVideoPath))
+                throw new FileNotFoundException("Unable to find mission video file");
+
+            mep.StartEncoding(MissionVideoManager.TempVideoPath, MissionVideoManager.GetMissionVideoPath(Mission!));
+            await mepd.ShowAsync();
         }
     }
 }

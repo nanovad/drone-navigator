@@ -102,9 +102,8 @@ namespace DroneNavigator
                 this.Close();
 
                 flightWindow.Activate();
-                flightWindow.Closed += delegate
+                flightWindow.OnMissionVideoEncodingCompleted += delegate
                 {
-                    // When the Flight interface closes, spawn a new landing page
                     MainWindow newMain = new();
                     newMain.Activate();
                 };

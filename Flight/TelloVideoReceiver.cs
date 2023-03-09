@@ -3,6 +3,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -12,6 +13,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using Windows.Media.Core;
 using Windows.Media.MediaProperties;
+using Windows.Media.Transcoding;
+using Windows.Storage;
+using FlightDataModel;
 
 namespace Flight
 {
@@ -66,6 +70,12 @@ namespace Flight
         public void SynchronousReceiveVideo()
         {
             _watch.Start();
+
+            // Ensure video folder is created.
+            Directory.CreateDirectory(MissionVideoManager.BaseVideoFolderPath);
+            FileStream videoTempStream = new(MissionVideoManager.TempVideoPath, FileMode.Create, FileAccess.Write);
+            BinaryWriter videoTempWriter = new(videoTempStream);
+
             while(!_quitting)
             {
                 TimeSpan timeIndex = this._watch.Elapsed;
@@ -79,11 +89,15 @@ namespace Flight
 
                     //VideoSample vs = new(timeIndex, _watch.Elapsed - timeIndex, buf);
                     _samples.Enqueue(MediaStreamSample.CreateFromBuffer(buf.AsBuffer(), timeIndex));
+
+                    videoTempStream.Write(buf);
                 }
                 catch
                 {
                 }
             }
+            videoTempWriter.Close();
+            videoTempStream.Close();
         }
 
         public void Start()
