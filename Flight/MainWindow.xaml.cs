@@ -21,6 +21,7 @@ using Microsoft.UI.Dispatching;
 using Windows.Media.Core;
 using Windows.Media.Playback;
 using Windows.Storage;
+using CDI;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -52,6 +53,7 @@ namespace Flight
         {
             this.InitializeComponent();
             api = new();
+            api.OnFlightStatusChanged += ApiOnOnFlightStatusChanged;
             Cdi.StatusProvider = api;
 
             Cdi.DroneVideoElement.AutoPlay = true;
@@ -59,6 +61,13 @@ namespace Flight
             Cdi.DroneVideoElement.Source = new MediaPlaybackItem(
                 MediaSource.CreateFromMediaStreamSource(api.VideoReceiver.MediaStreamSource));
             _fic.TargetApi = api;
+        }
+
+        private void ApiOnOnFlightStatusChanged(object sender, FlightStatusChangedEventArgs e)
+        {
+            FlightStateModel fsm = e.FlightState;
+            fsm.Mission = Mission!.Id;
+            _fdc.Add(fsm);
         }
 
         private void ConnectButton_OnClick(object sender, RoutedEventArgs e)
@@ -76,6 +85,9 @@ namespace Flight
 
                 // Clear the last frame from the video player.
                 Cdi.DroneVideoElement.Source = null;
+
+                // Save any outstanding DB changes.
+                _fdc.SaveChanges();
 
                 // Restore the button content.
                 ConnectButton.Content = "Connect";
@@ -180,6 +192,9 @@ namespace Flight
             // Track if any video was actually recorded - if not, there is nothing to encode.
             if (!_missionVideoToEncode)
                 return;
+
+            // Save any changes (probably FlightState) to the database.
+            _fdc.SaveChanges();
 
             // At this point, we have a mission video that needs to be encoded.
 
