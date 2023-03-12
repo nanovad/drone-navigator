@@ -44,6 +44,8 @@ namespace Flight
         private readonly FlightDataContext _fdc = new();
         public MissionModel? Mission;
 
+        private MissionAwareFlightStatusProvider? _mafsp;
+
         private bool _missionVideoToEncode = false;
         private bool _missionVideoEncoded = false;
 
@@ -53,8 +55,6 @@ namespace Flight
         {
             this.InitializeComponent();
             api = new();
-            api.OnFlightStatusChanged += ApiOnOnFlightStatusChanged;
-            Cdi.StatusProvider = api;
 
             Cdi.DroneVideoElement.AutoPlay = true;
             Cdi.DroneVideoElement.MediaPlayer.RealTimePlayback = true;
@@ -63,17 +63,17 @@ namespace Flight
             _fic.TargetApi = api;
         }
 
-        private void ApiOnOnFlightStatusChanged(object sender, FlightStatusChangedEventArgs e)
+        private void MafspOnOnFlightStatusChanged(object sender, FlightStatusChangedEventArgs e)
         {
-            FlightStateModel fsm = e.FlightState;
-            fsm.Mission = Mission!.Id;
-            _fdc.Add(fsm);
+            _fdc.Add(e.FlightState);
         }
 
         private void ConnectButton_OnClick(object sender, RoutedEventArgs e)
         {
             // If we are currently connected, this button turns into a disconnect button, so take that action instead.
             if(api.Connected) {
+                Mission!.EndDateTimeOffset = DateTimeOffset.Now;
+
                 // Stop the video stream.
                 api.StopVideo();
 
@@ -93,6 +93,10 @@ namespace Flight
                 ConnectButton.Content = "Connect";
                 return;
             }
+
+            _mafsp = new MissionAwareFlightStatusProvider(api, Mission!);
+            _mafsp.OnFlightStatusChanged += MafspOnOnFlightStatusChanged;
+            Cdi.StatusProvider = _mafsp;
 
             // Create a StackPanel that will hold a ProgressRing and a TextBlock that indicates we are connecting.
             StackPanel buttonStack = new() { Orientation = Orientation.Horizontal };
@@ -150,6 +154,7 @@ namespace Flight
                         ConnectButton.IsEnabled = true;
                         ConnectionFailedInfoBar.IsOpen = false;
                         Cdi.DroneVideoElement.MediaPlayer.Play();
+                        Mission!.StartDateTimeOffset = DateTimeOffset.Now;
                     });
 
                 }
@@ -188,8 +193,11 @@ namespace Flight
             if(_missionVideoEncoded)
                 return;
 
-            if(api.Connected)
+            if (api.Connected)
+            {
                 api.StopVideo();
+                Mission!.EndDateTimeOffset = DateTimeOffset.Now;
+            }
             api.StopConnection();
 
             // Track if any video was actually recorded - if not, there is nothing to encode.
