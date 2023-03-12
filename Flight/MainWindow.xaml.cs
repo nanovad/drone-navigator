@@ -126,7 +126,10 @@ namespace Flight
                     try
                     {
                         _fic.Initialize();
-                        BadControllerInfoBar.IsOpen = false;
+                        _dq.TryEnqueue(() =>
+                        {
+                            BadControllerInfoBar.IsOpen = false;
+                        });
                         _fic.BeginInputPolling();
                     }
                     catch (ControllerNotFoundException cnfe)
