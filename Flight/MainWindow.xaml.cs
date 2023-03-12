@@ -36,6 +36,8 @@ namespace Flight
 
         private readonly TelloApi api;
 
+        private readonly InputController _fic = new(50);
+
         private readonly DispatcherQueue _dq = DispatcherQueue.GetForCurrentThread();
 
         private readonly FlightDataContext _fdc = new();
@@ -55,6 +57,7 @@ namespace Flight
             Cdi.DroneVideoElement.MediaPlayer.RealTimePlayback = true;
             Cdi.DroneVideoElement.Source = new MediaPlaybackItem(
                 MediaSource.CreateFromMediaStreamSource(api.VideoReceiver.MediaStreamSource));
+            _fic.TargetApi = api;
         }
 
         private void ConnectButton_OnClick(object sender, RoutedEventArgs e)
@@ -65,6 +68,9 @@ namespace Flight
                 api.StopConnection();
                 // Stop the video stream.
                 api.StopVideo();
+
+                // Stop polling for input from the gamepad.
+                _fic.EndInputPolling();
 
                 // Clear the last frame from the video player.
                 Cdi.DroneVideoElement.Source = null;
@@ -102,6 +108,22 @@ namespace Flight
                 {
                     api.StartConnection();
 
+                    // Start up gamepad polling
+                    try
+                    {
+                        _fic.Initialize();
+                        BadControllerInfoBar.IsOpen = false;
+                        _fic.BeginInputPolling();
+                    }
+                    catch (ControllerNotFoundException cnfe)
+                    {
+                        _dq.TryEnqueue(() =>
+                        {
+                            BadControllerInfoBar.IsOpen = true;
+                            BadControllerInfoBar.Message = cnfe.Message;
+                        });
+                    }
+
                     api.StartVideo();
 
                     _dq.TryEnqueue(() => {
@@ -122,6 +144,7 @@ namespace Flight
                         ConnectButton.Content = "Connect";
                         ConnectButton.IsEnabled = true;
                         ConnectionFailedInfoBar.IsOpen = true;
+                        BadControllerInfoBar.IsOpen = false;
                     });
                 }
             });

@@ -22,6 +22,13 @@
                  Severity="Error"
                  IsOpen="False"
                  Grid.Row="0" />
+        <!-- A normally hidden InfoBar that displays when a problem occurred with the controller. -->
+        <InfoBar x:Name="BadControllerInfoBar"
+                 Title="Controller problem"
+                 Message="Please ensure your controller is powered on and connected"
+                 Severity="Error"
+                 IsOpen="False"
+                 Grid.Row="0" />
         <!-- The command buttons panel -->
         <StackPanel Orientation="Horizontal" x:Name="CommandButtonsPanel" Grid.Row="1" Margin="5">
             <Button x:Name="ConnectButton" Content="Connect" Click="ConnectButton_OnClick" Margin="5" />

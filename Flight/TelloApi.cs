@@ -320,5 +320,10 @@ namespace Flight
             _telloVideoReceiver.Stop();
             return SendCommandAndWaitForResponse("streamoff");
         }
+
+        public void RcControl(int roll, int pitch, int throttle, int yaw)
+        {
+            SendCommand($"rc {roll:D} {pitch:D} {throttle:D} {yaw:D}");
+        }
     }
 }
