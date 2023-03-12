@@ -19,8 +19,10 @@ namespace FlightDataModel
 
         public FlightDataContext()
         {
-            string localAppDataPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-            DbPath = System.IO.Path.Join(localAppDataPath, "DroneNavigator.db");
+            string localAppDataPath = Path.Join(
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "DroneNavigator");
+            Directory.CreateDirectory(localAppDataPath);
+            DbPath = Path.Join(localAppDataPath, "DroneNavigator.db");
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) =>
