@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
@@ -33,11 +34,20 @@ namespace Flight
         private volatile bool _quitting = false;
         public bool Connected = false;
 
-        public TelloStateReceiver(IPEndPoint telloEndPoint, FlightStateChangedCallback updateCallback)
+        public TelloStateReceiver(FlightStateChangedCallback updateCallback)
         {
-            _telloEndPoint = new IPEndPoint(IPAddress.Any, TelloStatePort);
+            NetworkChange.NetworkAddressChanged += delegate
+            {
+                _telloEndPoint = GenerateTelloEndPoint();
+            };
+            _telloEndPoint = GenerateTelloEndPoint();
             _telloStateClient.Client.ReceiveTimeout = 500; // Milliseconds
             FlightStateChanged += updateCallback;
+        }
+
+        private static IPEndPoint GenerateTelloEndPoint()
+        {
+            return new IPEndPoint(IPAddress.Any, TelloStatePort);
         }
 
         public void Quit()
@@ -203,7 +213,7 @@ namespace Flight
 
         public TelloApi()
         {
-            _telloStateReceiver = new TelloStateReceiver(_telloEndPoint, StateUpdatedCallback);
+            _telloStateReceiver = new TelloStateReceiver(StateUpdatedCallback);
             _stateThread = new Thread(new ThreadStart(_telloStateReceiver.ConstantlyReceiveState));
             _stateThread.Start();
             _commandResponseClient.Connect(_telloEndPoint);
