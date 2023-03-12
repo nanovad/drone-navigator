@@ -43,6 +43,7 @@ namespace Flight
         private readonly FlightDataContext _fdc = new();
         public MissionModel? Mission;
 
+        private bool _missionVideoToEncode = false;
         private bool _missionVideoEncoded = false;
 
         public event EventHandler? OnMissionVideoEncodingCompleted;
@@ -64,10 +65,11 @@ namespace Flight
         {
             // If we are currently connected, this button turns into a disconnect button, so take that action instead.
             if(api.Connected) {
-                // Disconnect (sets the api.Connected property to false, plus performs the actual disconnection).
-                api.StopConnection();
                 // Stop the video stream.
                 api.StopVideo();
+
+                // Disconnect (sets the api.Connected property to false, plus performs the actual disconnection).
+                api.StopConnection();
 
                 // Stop polling for input from the gamepad.
                 _fic.EndInputPolling();
@@ -125,6 +127,7 @@ namespace Flight
                     }
 
                     api.StartVideo();
+                    _missionVideoToEncode = true;
 
                     _dq.TryEnqueue(() => {
                         // If StartConnection() does not throw an exception, we can assume the connection succeeded.
@@ -169,10 +172,18 @@ namespace Flight
             // This boolean ensures that we actually close the window the second time around.
             if(_missionVideoEncoded)
                 return;
-            api.StopConnection();
-            api.StopVideo();
 
-            // Prevents the window from automatically closing.
+            if(api.Connected)
+                api.StopVideo();
+            api.StopConnection();
+
+            // Track if any video was actually recorded - if not, there is nothing to encode.
+            if (!_missionVideoToEncode)
+                return;
+
+            // At this point, we have a mission video that needs to be encoded.
+
+            // Prevent the window from automatically closing.
             args.Handled = true;
 
             MissionEncodingPage mep = new();
