@@ -15,6 +15,9 @@ using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.Media.Core;
+using Windows.Media.Playback;
+using FlightDataModel;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -26,14 +29,19 @@ namespace Review
     /// </summary>
     public sealed partial class MainWindow : Window
     {
+        private ReplaySynchronizer? _synchronizer;
+        public MissionModel? Mission;
+
         public MainWindow()
         {
             this.InitializeComponent();
         }
 
-        private void myButton_Click(object sender, RoutedEventArgs e)
+        public void Initialize(MissionModel mission)
         {
-            myButton.Content = "Clicked";
+            Mission = mission;
+            _synchronizer = new ReplaySynchronizer(mission, Cdi.DroneVideoElement);
+            Cdi.StatusProvider = _synchronizer;
         }
     }
 }

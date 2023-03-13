@@ -55,7 +55,8 @@ namespace Flight
             TimeSpan videoDuration = FFProbe.Analyse(tempFilePath).Duration;
             var args = FFMpegCore.FFMpegArguments.FromFileInput(tempFilePath)
                 .OutputToFile(outFilePath, true, options => options
-                    .WithVideoCodec(VideoCodec.LibX264))
+                    .WithVideoCodec(VideoCodec.LibX264)
+                    .WithFramerate(30.00))
                     .NotifyOnProgress(FFMpegEncodingProgressChanged, videoDuration);
             args.ProcessAsynchronously().ContinueWith(t => {
                 OnEncodeCompleted?.Invoke(this, EventArgs.Empty);

@@ -13,6 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Numerics;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
 using Windows.Foundation;
@@ -66,6 +67,9 @@ namespace CDI
             _dq.TryEnqueue(() =>
             {
                 RefreshMet(state);
+                RefreshSnr(state);
+                RefreshSpeed(state);
+                RefreshAltitude(state);
             });
         }
 
@@ -75,6 +79,22 @@ namespace CDI
             stringBuilder.Append("MET: ");
             stringBuilder.Append(TimeSpan.FromMilliseconds(state.Met).ToString("c"));
             this.MetTextBlock.Text = stringBuilder.ToString();
+        }
+
+        private void RefreshSnr(FlightStateModel state)
+        {
+            state.Snr = state.Snr;
+        }
+
+        private void RefreshSpeed(FlightStateModel state)
+        {
+            Vector3 v = new Vector3(state.Vgx, state.Vgy, state.Vgz);
+            this.SpeedTextBlock.Text = $"{v.Length()}MPH";
+        }
+
+        private void RefreshAltitude(FlightStateModel state)
+        {
+            this.AltitudeTextBlock.Text = $"Altitude: {state.Altitude}";
         }
     }
 }

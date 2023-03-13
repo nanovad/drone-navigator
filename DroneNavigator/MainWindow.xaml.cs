@@ -50,6 +50,9 @@ namespace DroneNavigator
         {
             FrameworkElement el = (FrameworkElement)sender;
             MissionModel selectedMission = (MissionModel)el.DataContext;
+            Review.MainWindow reviewWindow = new();
+            reviewWindow.Initialize(selectedMission);
+            reviewWindow.Activate();
         }
 
         private void MissionListView_OnSelectionChanged(object sender, SelectionChangedEventArgs e)

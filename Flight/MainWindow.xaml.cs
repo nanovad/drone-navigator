@@ -48,6 +48,7 @@ namespace Flight
 
         private bool _missionVideoToEncode = false;
         private bool _missionVideoEncoded = false;
+        private bool _videoBegan = false;
 
         public event EventHandler? OnMissionVideoEncodingCompleted;
 
@@ -60,6 +61,15 @@ namespace Flight
             Cdi.DroneVideoElement.MediaPlayer.RealTimePlayback = true;
             Cdi.DroneVideoElement.Source = new MediaPlaybackItem(
                 MediaSource.CreateFromMediaStreamSource(api.VideoReceiver.MediaStreamSource));
+            Cdi.DroneVideoElement.MediaPlayer.PlaybackSession.PositionChanged += delegate
+            {
+                if (!_videoBegan)
+                {
+                    Mission!.StartDateTimeOffset = DateTimeOffset.Now;
+                }
+
+                _videoBegan = true;
+            };
             _fic.TargetApi = api;
         }
 
@@ -71,7 +81,9 @@ namespace Flight
         private void ConnectButton_OnClick(object sender, RoutedEventArgs e)
         {
             // If we are currently connected, this button turns into a disconnect button, so take that action instead.
-            if(api.Connected) {
+            if(api.Connected)
+            {
+                _fdc.Update(Mission!);
                 Mission!.EndDateTimeOffset = DateTimeOffset.Now;
 
                 // Stop the video stream.
@@ -154,6 +166,7 @@ namespace Flight
                         ConnectButton.IsEnabled = true;
                         ConnectionFailedInfoBar.IsOpen = false;
                         Cdi.DroneVideoElement.MediaPlayer.Play();
+                        _fdc.Update(Mission!);
                         Mission!.StartDateTimeOffset = DateTimeOffset.Now;
                     });
 
@@ -196,7 +209,8 @@ namespace Flight
             if (api.Connected)
             {
                 api.StopVideo();
-                Mission!.EndDateTimeOffset = DateTimeOffset.Now;
+                _fdc.Update(Mission!);
+                //Mission!.EndDateTimeOffset = DateTimeOffset.Now;
             }
             api.StopConnection();
 
