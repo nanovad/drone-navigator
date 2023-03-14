@@ -68,6 +68,7 @@ namespace CDI
             {
                 RefreshMet(state);
                 RefreshSnr(state);
+                RefreshBattery(state);
                 RefreshSpeed(state);
                 RefreshAltitude(state);
             });
@@ -86,10 +87,20 @@ namespace CDI
             state.Snr = state.Snr;
         }
 
+        private void RefreshBattery(FlightStateModel state)
+        {
+            float batteryPct = state.BatteryPercent;
+            this.BatteryIcon.Glyph = BatteryGlyph.FromPercent(batteryPct);
+            this.BatteryTextBlock.Text = $"Batt: {(int)batteryPct:D}%";
+        }
+
         private void RefreshSpeed(FlightStateModel state)
         {
             Vector3 v = new Vector3(state.Vgx, state.Vgy, state.Vgz);
-            this.SpeedTextBlock.Text = $"{v.Length()}MPH";
+            double dmsSpeedAbs = v.Length();
+            double cmsSpeedAbs = dmsSpeedAbs * 10;
+            double mphSpeedAbs = cmsSpeedAbs * 0.022369362912;
+            this.SpeedTextBlock.Text = $"{mphSpeedAbs:f2} MPH";
         }
 
         private void RefreshAltitude(FlightStateModel state)
