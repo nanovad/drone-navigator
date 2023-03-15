@@ -7,6 +7,7 @@ using Windows.Media.Core;
 using Windows.Media.Playback;
 using CDI;
 using FlightDataModel;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
 namespace Review
@@ -21,6 +22,8 @@ namespace Review
         private readonly List<Tuple<int, int>> _metList;
 
         private MediaPlayerElement _mpe;
+
+        private readonly DispatcherTimer _flightStatusTimer = new();
 
         public ReplaySynchronizer(MissionModel mission, MediaPlayerElement mpe)
         {
@@ -38,8 +41,11 @@ namespace Review
             _mpe.AutoPlay = false;
             _mpe.Source = MediaSource.CreateFromUri(new Uri(missionVideoPath));
             _mpe.MediaPlayer.Play();
-            _mpe.MediaPlayer.PlaybackSession.PositionChanged += PlaybackSessionOnPositionChanged;
             _mpe.AreTransportControlsEnabled = true;
+
+            _flightStatusTimer.Interval = TimeSpan.FromMilliseconds(10);
+            _flightStatusTimer.Tick += FlightStatusTimerOnTick;
+            _flightStatusTimer.Start();
 
             _metList = (
                 from state in _fdc.FlightStates.Where(
@@ -48,15 +54,14 @@ namespace Review
                 .ToList();
         }
 
-        private void PlaybackSessionOnPositionChanged(MediaPlaybackSession sender, object args)
+        private void FlightStatusTimerOnTick(object? sender, object e)
         {
-            int curMillis = (int)sender.Position.TotalMilliseconds + _metOffset;
+            int curMillis = (int)_mpe.MediaPlayer.PlaybackSession.Position.TotalMilliseconds + _metOffset;
             int closestStateId =
                 _metList.Aggregate((x, y) =>
                     Math.Abs(x.Item2 - curMillis) < Math.Abs(y.Item2 - curMillis) ? x : y)
                 .Item1; // The mission ID is Item1 in the tuple
             FlightStateModel closestState = _fdc.FlightStates.Find(closestStateId) ?? new FlightStateModel();
-            //FlightStateModel closestState = _fdc.FlightStates.Where((state) => state.Mission == _mission.Id).ToList().Aggregate((x,y) => Math.Abs(x.Met-curMillis) < Math.Abs(y.Met-curMillis) ? x : y);
             OnFlightStatusChanged?.Invoke(this, new FlightStatusChangedEventArgs(closestState));
         }
     }
