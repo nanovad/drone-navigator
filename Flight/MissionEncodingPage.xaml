@@ -15,7 +15,7 @@
             <RowDefinition>*</RowDefinition>
             <RowDefinition>Auto</RowDefinition>
         </Grid.RowDefinitions>
-        <ProgressBar x:Name="EncodingProgressBar" IsIndeterminate="True" Grid.Row="0" Value="0" Margin="16, 8, 16, 0" />
+        <ProgressBar x:Name="EncodingProgressBar" Grid.Row="0" Value="0" Margin="16, 8, 16, 0" />
         <TextBlock x:Name="PercentTextBlock" Grid.Row="1" HorizontalAlignment="Left" VerticalAlignment="Center" />
     </Grid>
 </Page>

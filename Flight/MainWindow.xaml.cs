@@ -10,6 +10,7 @@ using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Navigation;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -206,9 +207,11 @@ namespace Flight
             if(_missionVideoEncoded)
                 return;
 
+            var queue = new ConcurrentQueue<MediaStreamSample>();
+
             if (api.Connected)
             {
-                api.StopVideo();
+                queue = api.StopVideo();
                 _fdc.Update(Mission!);
                 //Mission!.EndDateTimeOffset = DateTimeOffset.Now;
             }
@@ -246,7 +249,10 @@ namespace Flight
             if (!File.Exists(MissionVideoManager.TempVideoPath))
                 throw new FileNotFoundException("Unable to find mission video file");
 
-            mep.StartEncoding(MissionVideoManager.TempVideoPath, MissionVideoManager.GetMissionVideoPath(Mission!));
+            mep.StartEncoding(
+                queue,
+                api.VideoReceiver.VideoEncodingProperties,
+                MissionVideoManager.GetMissionVideoPath(Mission!));
             await mepd.ShowAsync();
         }
     }

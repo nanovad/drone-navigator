@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -8,6 +9,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
+using Windows.Media.Core;
 using CDI;
 using FlightDataModel;
 
@@ -216,6 +218,7 @@ namespace Flight
             _telloStateReceiver = new TelloStateReceiver(StateUpdatedCallback);
             _stateThread = new Thread(new ThreadStart(_telloStateReceiver.ConstantlyReceiveState));
             _stateThread.Start();
+            _commandResponseClient.Client.ReceiveTimeout = 5000;
             _commandResponseClient.Connect(_telloEndPoint);
 
             _telloVideoReceiver = new TelloVideoReceiver(VideoStreamPort);
@@ -248,8 +251,19 @@ namespace Flight
         {
             SendCommand(command);
             // Read the response string from the drone, convert it to a UTF-8 string, and trim trailing CRLF newlines
-            string response = Encoding.UTF8.GetString(_commandResponseClient.Receive(ref _telloEndPoint))
-                .TrimEnd('\r', '\n');
+            string response = "";
+            try
+            {
+                response = Encoding.UTF8.GetString(_commandResponseClient.Receive(ref _telloEndPoint))
+                    .TrimEnd('\r', '\n');
+            }
+            catch (SocketException e)
+            {
+                if (e.SocketErrorCode == SocketError.TimedOut)
+                    return CommandResponse.Error;
+                throw;
+            }
+
             return response == "ok" ? CommandResponse.Ok : CommandResponse.Error;
         }
 
@@ -325,10 +339,11 @@ namespace Flight
             return SendCommandAndWaitForResponse("streamon");
         }
 
-        public CommandResponse StopVideo()
+        public ConcurrentQueue<MediaStreamSample> StopVideo()
         {
-            _telloVideoReceiver.Stop();
-            return SendCommandAndWaitForResponse("streamoff");
+            var queue = _telloVideoReceiver.Stop();
+            SendCommandAndWaitForResponse("streamoff");
+            return queue;
         }
 
         public void RcControl(int roll, int pitch, int throttle, int yaw)
