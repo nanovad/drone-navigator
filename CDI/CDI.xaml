@@ -10,7 +10,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
-    <SplitView x:Name="MainContentSplit" IsPaneOpen="true" DisplayMode="Inline" PanePlacement="Right" IsEnabled="False">
+    <SplitView x:Name="MainContentSplit" IsPaneOpen="true" DisplayMode="Inline" PanePlacement="Right">
         <!-- Pane area - flight parameters (MET, battery, signal, etc) -->
         <SplitView.Pane>
             <Grid Margin="8">
