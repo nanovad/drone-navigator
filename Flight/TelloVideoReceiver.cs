@@ -25,6 +25,7 @@ namespace Flight
         private IPEndPoint _telloEndPoint;
 
         private readonly VideoEncodingProperties _vep;
+        public VideoEncodingProperties VideoEncodingProperties => _vep;
         public MediaStreamSource MediaStreamSource;
 
         private readonly Thread _receiveThread;
@@ -43,6 +44,7 @@ namespace Flight
             _vep = VideoEncodingProperties.CreateH264();
             _vep.Height = 720;
             _vep.Width = 960;
+            _vep.Bitrate = 5 * 1024 * 1024;
 
             MediaStreamSource = new MediaStreamSource(new VideoStreamDescriptor(_vep));
             MediaStreamSource.SampleRequested += MediaStreamSource_SampleRequested;
