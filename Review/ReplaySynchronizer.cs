@@ -41,7 +41,24 @@ namespace Review
             _mpe.AutoPlay = false;
             _mpe.Source = MediaSource.CreateFromUri(new Uri(missionVideoPath));
             _mpe.MediaPlayer.Play();
+
+            // Transport control settings
             _mpe.AreTransportControlsEnabled = true;
+            // Enable fast forward button & make it visible
+            _mpe.TransportControls.IsFastForwardEnabled = true;
+            _mpe.TransportControls.IsFastForwardButtonVisible = true;
+            // Enable fast rewind button & make it visible
+            _mpe.TransportControls.IsFastRewindEnabled = true;
+            _mpe.TransportControls.IsFastRewindButtonVisible = true;
+            // Disable volume button and hide it
+            _mpe.TransportControls.IsVolumeEnabled = false;
+            _mpe.TransportControls.IsVolumeButtonVisible = false;
+            // Enable playback rate button and make it visible
+            _mpe.TransportControls.IsPlaybackRateEnabled = true;
+            _mpe.TransportControls.IsPlaybackRateButtonVisible = true;
+            // Enable zoom controls and make them visible
+            _mpe.TransportControls.IsZoomEnabled = true;
+            _mpe.TransportControls.IsZoomButtonVisible = true;
 
             _flightStatusTimer.Interval = TimeSpan.FromMilliseconds(10);
             _flightStatusTimer.Tick += FlightStatusTimerOnTick;

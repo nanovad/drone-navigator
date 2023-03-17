@@ -76,10 +76,7 @@ namespace CDI
 
         private void RefreshMet(FlightStateModel state)
         {
-            StringBuilder stringBuilder = new();
-            stringBuilder.Append("MET: ");
-            stringBuilder.Append(TimeSpan.FromMilliseconds(state.Met).ToString("c"));
-            this.MetTextBlock.Text = stringBuilder.ToString();
+            this.MetTextBlock.Text = $"MET: {TimeSpan.FromMilliseconds(state.Met):hh\\:mm\\:ss\\.fff}";
         }
 
         private void RefreshSnr(FlightStateModel state)

@@ -24,7 +24,7 @@
                 </Grid.RowDefinitions>
 
                 <!-- Mission Elapsed Time row -->
-                <TextBlock x:Name="MetTextBlock" Text="MET: " Grid.Row="0"></TextBlock>
+                <TextBlock x:Name="MetTextBlock" Text="MET: " Grid.Row="0" FontSize="20" HorizontalAlignment="Center"></TextBlock>
 
                 <!-- Signal, battery, and battery life row -->
                 <StackPanel
