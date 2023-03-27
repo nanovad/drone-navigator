@@ -67,6 +67,7 @@ namespace DroneNavigator
         {
             // Spawn the "Start new mission" dialog.
             StartNewMissionDialog snmd = new();
+            snmd.Drones = fdc.Drones.ToList();
             ContentDialog cd = new();
             cd.XamlRoot = this.Content.XamlRoot;
             cd.Content = snmd;
@@ -74,8 +75,12 @@ namespace DroneNavigator
             cd.CloseButtonText = "Cancel";
             cd.PrimaryButtonClick += delegate(ContentDialog sender, ContentDialogButtonClickEventArgs args)
             {
-                // TODO: Validate snmd.DroneId?
-                if(String.IsNullOrEmpty(snmd.MissionName)) {
+                if (snmd.DroneId == null)
+                {
+                    snmd.ErrorMessage = "Must select a drone";
+                    args.Cancel = true;
+                }
+                else if(String.IsNullOrEmpty(snmd.MissionName)) {
                     snmd.ErrorMessage = "Must enter a mission name";
                     args.Cancel = true;
                 }
@@ -91,7 +96,7 @@ namespace DroneNavigator
                 // Commit the mission (as defined by the dialog's textboxes) to the DB
                 MissionModel newMission = new()
                 {
-                    Drone = snmd.DroneId ?? 0, // BUG: Can't have a 0 DroneId, probably a recipe for breakage
+                    Drone = snmd.DroneId ?? 0, // Just a safeguard - form validation should catch if DroneId is null
                     Name = snmd.MissionName,
                     Description = snmd.MissionDescription,
                     StartDateTimeOffset = DateTimeOffset.Now

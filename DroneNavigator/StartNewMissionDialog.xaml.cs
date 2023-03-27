@@ -30,6 +30,9 @@ namespace DroneNavigator
         public string MissionName => MissionNameTextBox.Text;
         public string MissionDescription => MissionDescTextBox.Text;
         public int? DroneId => (DroneComboBox.SelectionBoxItem as DroneModel)?.Id;
+
+        public List<DroneModel> Drones { get; set; }
+
         public string ErrorMessage {
             get {
                 return ErrorMessageTextBox.Text;
