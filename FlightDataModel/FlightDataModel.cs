@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -48,6 +49,8 @@ namespace FlightDataModel
         public DateTimeOffset StartDateTimeOffset { get; set; }
         public DateTimeOffset EndDateTimeOffset { get; set; }
         public float Distance { get; set; }
+        [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
+        public TimeSpan Duration { get => EndDateTimeOffset - StartDateTimeOffset; }
     }
 
     public class CommandModel
