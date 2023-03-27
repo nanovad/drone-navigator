@@ -109,10 +109,10 @@ namespace DroneNavigator
                 Flight.MainWindow flightWindow = new();
                 flightWindow.Mission = newMission;
                 // Close our window - we're about to swap to the Flight interface
-                //this.Close();
+                (Application.Current as App)?.Window.Close();
 
                 flightWindow.Activate();
-                flightWindow.OnMissionVideoEncodingCompleted += delegate
+                flightWindow.FlightFinished += delegate
                 {
                     MainWindow newMain = new();
                     newMain.Activate();

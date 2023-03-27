@@ -52,6 +52,7 @@ namespace Flight
         private bool _videoBegan = false;
 
         public event EventHandler? OnMissionVideoEncodingCompleted;
+        public event EventHandler? FlightFinished;
 
         public MainWindow()
         {
@@ -204,8 +205,11 @@ namespace Flight
             // Short circuit if we've already encoded the video. This handler actually gets called twice - once when
             // the user initiates the window closing, and again when the OnEncodeCompleted callback is run.
             // This boolean ensures that we actually close the window the second time around.
-            if(_missionVideoEncoded)
+            if (_missionVideoEncoded)
+            {
+                FlightFinished?.Invoke(this, EventArgs.Empty);
                 return;
+            }
 
             var queue = new ConcurrentQueue<MediaStreamSample>();
 
@@ -219,7 +223,10 @@ namespace Flight
 
             // Track if any video was actually recorded - if not, there is nothing to encode.
             if (!_missionVideoToEncode)
+            {
+                FlightFinished?.Invoke(this, EventArgs.Empty);
                 return;
+            }
 
             // Save any changes (probably FlightState) to the database.
             _fdc.SaveChanges();
@@ -254,6 +261,7 @@ namespace Flight
                 api.VideoReceiver.VideoEncodingProperties,
                 MissionVideoManager.GetMissionVideoPath(Mission!));
             await mepd.ShowAsync();
+            FlightFinished?.Invoke(this, EventArgs.Empty);
         }
     }
 }

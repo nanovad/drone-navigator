@@ -51,5 +51,6 @@ namespace DroneNavigator
         }
 
         private Window m_window;
+        public Window Window => m_window;
     }
 }
