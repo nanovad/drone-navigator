@@ -1,0 +1,37 @@
+<!-- Copyright (c) Microsoft Corporation and Contributors. -->
+<!-- Licensed under the MIT License. -->
+
+<!-- Need to manually set the style of subclassed ContentDialogs
+     See https://github.com/microsoft/microsoft-ui-xaml/issues/3486 -->
+<ContentDialog
+    x:Class="DroneNavigator.EditDroneDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:DroneNavigator"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Title="Create a new drone"
+    PrimaryButtonText="Save"
+    SecondaryButtonText="Cancel"
+    DefaultButton="Primary"
+    Style="{StaticResource DefaultContentDialogStyle}"
+    PrimaryButtonClick="NewDroneDialog_PrimaryButtonClick">
+
+    <Page Background="Transparent">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <TextBox x:Name="DroneNameTextBox" Grid.Row="0" Margin="8" PlaceholderText="Name" />
+            <TextBox x:Name="DroneMakeTextBox" Grid.Row="1" Margin="8" PlaceholderText="Make" />
+            <TextBox x:Name="DroneModelTextBox" Grid.Row="2" Margin="8" PlaceholderText="Model" />
+
+            <TextBlock x:Name="ValidationMessageTextBox" Grid.Row="3"
+                   Foreground="Red" FontWeight="SemiBold" Visibility="Collapsed">Unable to save.</TextBlock>
+        </Grid>
+    </Page>
+</ContentDialog>

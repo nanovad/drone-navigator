@@ -29,87 +29,26 @@ namespace DroneNavigator
     /// </summary>
     public sealed partial class MainWindow : Window
     {
-        private FlightDataContext fdc;
-
         public MainWindow()
         {
             this.InitializeComponent();
-            Microsoft.UI.Dispatching.
-                DispatcherQueue.GetForCurrentThread().TryEnqueue(Loaded);
-            fdc = new FlightDataContext();
-            fdc.Database.Migrate();
+            MainNavigationView.SelectedItem = MainNavigationView.MenuItems.ElementAt(0);
         }
 
-        public void Loaded()
+        private void MainNavigationView_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
         {
-            List<MissionModel> sourceList = fdc.Missions.ToList();
-            MissionListView.ItemsSource = sourceList;
-        }
-
-        private void ReplayMissionButton_OnClick(object sender, RoutedEventArgs e)
-        {
-            FrameworkElement el = (FrameworkElement)sender;
-            MissionModel selectedMission = (MissionModel)el.DataContext;
-            Review.MainWindow reviewWindow = new();
-            reviewWindow.Initialize(selectedMission);
-            reviewWindow.Activate();
-        }
-
-        private void MissionListView_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            // Disable selection by immediately deselecting upon selecting.
-            MissionListView.SelectedItem = null;
-        }
-
-        private async void StartNewMissionButton_OnClick(object sender, RoutedEventArgs e)
-        {
-            // Spawn the "Start new mission" dialog.
-            StartNewMissionDialog snmd = new();
-            ContentDialog cd = new();
-            cd.XamlRoot = this.Content.XamlRoot;
-            cd.Content = snmd;
-            cd.PrimaryButtonText = "Start";
-            cd.CloseButtonText = "Cancel";
-            cd.PrimaryButtonClick += delegate(ContentDialog sender, ContentDialogButtonClickEventArgs args)
+            if(args.IsSettingsSelected)
             {
-                // TODO: Validate snmd.DroneId?
-                if(String.IsNullOrEmpty(snmd.MissionName)) {
-                    snmd.ErrorMessage = "Must enter a mission name";
-                    args.Cancel = true;
-                }
-                else if(String.IsNullOrEmpty(snmd.MissionDescription)) {
-                    snmd.ErrorMessage = "Must enter a mission description";
-                    args.Cancel = true;
-                }
-            };
-            ContentDialogResult result = await cd.ShowAsync();
-
-            if (result == ContentDialogResult.Primary)
+                // We do not have a settings page - short circuit
+                return;
+            }
+            NavigationViewItem selected = (NavigationViewItem)args.SelectedItem;
+            if(args.SelectedItem != null)
             {
-                // Commit the mission (as defined by the dialog's textboxes) to the DB
-                MissionModel newMission = new()
-                {
-                    Drone = snmd.DroneId ?? 0, // BUG: Can't have a 0 DroneId, probably a recipe for breakage
-                    Name = snmd.MissionName,
-                    Description = snmd.MissionDescription,
-                    StartDateTimeOffset = DateTimeOffset.Now
-                };
-                fdc.Missions.Add(newMission);
-                fdc.SaveChanges();
-
-                // EF Core will have generated an ID for newMission at this point, so we can use it here.
-                // Begin initializing a new Flight window
-                Flight.MainWindow flightWindow = new();
-                flightWindow.Mission = newMission;
-                // Close our window - we're about to swap to the Flight interface
-                this.Close();
-
-                flightWindow.Activate();
-                flightWindow.OnMissionVideoEncodingCompleted += delegate
-                {
-                    MainWindow newMain = new();
-                    newMain.Activate();
-                };
+                string tag = selected.Tag as string;
+                string pageName = "DroneNavigator." + tag;
+                Type pageType = Type.GetType(pageName);
+                MainNavigationFrame.Navigate(pageType);
             }
         }
     }

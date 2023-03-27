@@ -8,46 +8,18 @@
     xmlns:local="using:DroneNavigator"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:flightDataModel="using:FlightDataModel"
     mc:Ignorable="d">
 
-    <Grid x:Name="MainGrid">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*"></RowDefinition>
-            <RowDefinition Height="Auto"></RowDefinition>
-        </Grid.RowDefinitions>
-
-        <!-- Main list of missions -->
-        <ListView Grid.Row="0" x:Name="MissionListView" SelectionChanged="MissionListView_OnSelectionChanged">
-            <ListView.ItemTemplate>
-                <DataTemplate x:DataType="flightDataModel:MissionModel" xmlns:xaml="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"></ColumnDefinition>
-                            <ColumnDefinition Width="75"></ColumnDefinition>
-                        </Grid.ColumnDefinitions>
-                        <Expander Grid.Column="0" Header="{x:Bind Name}" HorizontalAlignment="Stretch">
-                            <TextBlock Text="{x:Bind Description}"></TextBlock>
-                        </Expander>
-                        <StackPanel Grid.Column="1" x:Name="MissionButtons" VerticalAlignment="Center" HorizontalAlignment="Center">
-                            <Button x:Name="ReplayMissionButton" Click="ReplayMissionButton_OnClick">
-                                <Grid>
-                                    <SymbolIcon Symbol="Play"></SymbolIcon>
-                                    <SymbolIcon Symbol="Refresh"></SymbolIcon>
-                                </Grid>
-                            </Button>
-                        </StackPanel>
-                    </Grid>
-                </DataTemplate>
-            </ListView.ItemTemplate>
-        </ListView>
-
-        <!-- Panel below the mission list -->
-        <Border Grid.Row="1" BorderBrush="Silver" CornerRadius="8" Padding="5" BorderThickness="1" Margin="10">
-            <RelativePanel x:Name="CommandButtonRow" Margin="10">
-                <TextBox x:Name="SearchForMissionTextBox" PlaceholderText="Search..." MinWidth="300" RelativePanel.AlignLeftWithPanel="True"></TextBox>
-                <Button x:Name="StartNewMissionButton" RelativePanel.AlignRightWithPanel="True" Content="Start New Mission" Click="StartNewMissionButton_OnClick" />
-            </RelativePanel>
-        </Border>
-    </Grid>
+    <NavigationView
+        x:Name="MainNavigationView"
+        SelectionChanged="MainNavigationView_SelectionChanged"
+        IsSettingsVisible="False"
+        IsBackButtonVisible="Collapsed"
+        OpenPaneLength="200">
+        <NavigationView.MenuItems>
+            <NavigationViewItem Icon="Library" Content="Missions" Tag="MissionListPage" />
+            <NavigationViewItem Icon="Edit" Content="Drones" Tag="DroneListPage" />
+        </NavigationView.MenuItems>
+        <Frame x:Name="MainNavigationFrame" />
+    </NavigationView>
 </Window>

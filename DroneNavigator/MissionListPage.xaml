@@ -1,0 +1,71 @@
+<!-- Copyright (c) Microsoft Corporation and Contributors. -->
+<!-- Licensed under the MIT License. -->
+
+<Page
+    x:Class="DroneNavigator.MissionListPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:DroneNavigator"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    xmlns:flightDataModel="using:FlightDataModel"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <Grid x:Name="MainGrid">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+        </Grid.RowDefinitions>
+
+        <!-- Main list of missions -->
+        <ListView Grid.Row="0" x:Name="MissionListView" SelectionChanged="MissionListView_OnSelectionChanged">
+            <ListView.ItemTemplate>
+                <DataTemplate x:DataType="flightDataModel:MissionModel" xmlns:xaml="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+                    <Grid Margin="4">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"></ColumnDefinition>
+                            <ColumnDefinition Width="75"></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
+                        <Expander Grid.Column="0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left">
+                            <Expander.HeaderTemplate>
+                                <DataTemplate x:DataType="flightDataModel:MissionModel">
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Left">
+                                        <TextBlock Text="{x:Bind Name}" FontSize="16" FontWeight="SemiBold" />
+                                        <TextBlock Text="-" Margin="8,0,8,0" />
+                                        <TextBlock Text="{x:Bind Description}" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </Expander.HeaderTemplate>
+                            <RichTextBlock>
+                                <Paragraph>
+                                    <Run Text="Mission started: " />
+                                    <Run Text="{x:Bind StartDateTimeOffset}" />
+                                    <LineBreak />
+                                    <Run Text="Mission duration: " />
+                                    <Run Text='{x:Bind local:MissionListPage.FormatMissionDuration(Duration)}' />
+                                </Paragraph>
+                            </RichTextBlock>
+                        </Expander>
+                        <StackPanel Grid.Column="1" x:Name="MissionButtons" VerticalAlignment="Center" HorizontalAlignment="Center">
+                            <Button x:Name="ReplayMissionButton" Click="ReplayMissionButton_OnClick">
+                                <Grid>
+                                    <SymbolIcon Symbol="Play"></SymbolIcon>
+                                    <SymbolIcon Symbol="Refresh"></SymbolIcon>
+                                </Grid>
+                            </Button>
+                        </StackPanel>
+                    </Grid>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+
+        <!-- Panel below the mission list -->
+        <Border Grid.Row="1" BorderBrush="Silver" CornerRadius="8" Padding="5" BorderThickness="1" Margin="10">
+        <RelativePanel x:Name="CommandButtonRow" Margin="10">
+                <TextBox x:Name="SearchForMissionTextBox" PlaceholderText="Search..." MinWidth="300" RelativePanel.AlignLeftWithPanel="True"></TextBox>
+                <Button x:Name="StartNewMissionButton" RelativePanel.AlignRightWithPanel="True" Content="Start New Mission" Click="StartNewMissionButton_OnClick" />
+            </RelativePanel>
+        </Border>
+    </Grid>
+</Page>

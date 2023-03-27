@@ -15,6 +15,9 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="DroneListPage.xaml" />
+    <None Remove="EditDroneDialog.xaml" />
+    <None Remove="MissionListPage.xaml" />
     <None Remove="StartNewMissionDialog.xaml" />
   </ItemGroup>
 
@@ -52,6 +55,21 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Themes\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="EditDroneDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="DroneListPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="MissionListPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Page Update="StartNewMissionDialog.xaml">
