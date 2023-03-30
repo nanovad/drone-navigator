@@ -70,6 +70,7 @@ namespace DroneNavigator
             snmd.Drones = fdc.Drones.ToList();
             ContentDialog cd = new();
             cd.XamlRoot = this.Content.XamlRoot;
+            cd.Title = "Start a new mission";
             cd.Content = snmd;
             cd.PrimaryButtonText = "Start";
             cd.CloseButtonText = "Cancel";
