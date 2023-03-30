@@ -15,6 +15,7 @@
         SelectionChanged="MainNavigationView_SelectionChanged"
         IsSettingsVisible="False"
         IsBackButtonVisible="Collapsed"
+        IsPaneOpen="False"
         OpenPaneLength="200">
         <NavigationView.MenuItems>
             <NavigationViewItem Icon="Library" Content="Missions" Tag="MissionListPage" />
