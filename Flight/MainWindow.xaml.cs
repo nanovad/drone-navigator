@@ -261,7 +261,6 @@ namespace Flight
                 api.VideoReceiver.VideoEncodingProperties,
                 MissionVideoManager.GetMissionVideoPath(Mission!));
             await mepd.ShowAsync();
-            FlightFinished?.Invoke(this, EventArgs.Empty);
         }
     }
 }
