@@ -117,6 +117,7 @@ namespace DroneNavigator
                 {
                     MainWindow newMain = new();
                     newMain.Activate();
+                    (Application.Current as App)!.Window = newMain;
                 };
             }
         }

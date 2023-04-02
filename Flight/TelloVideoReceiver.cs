@@ -24,17 +24,27 @@ namespace Flight
         private readonly UdpClient _telloVideoClient;
         private IPEndPoint _telloEndPoint;
 
-        private readonly VideoEncodingProperties _vep;
-        public VideoEncodingProperties VideoEncodingProperties => _vep;
         public MediaStreamSource MediaStreamSource;
 
         private readonly Thread _receiveThread;
-        private volatile bool _quitting = false;
+        private volatile CancellationTokenSource _quitting = new();
 
         private readonly Stopwatch _watch = new();
 
         private readonly ConcurrentQueue<MediaStreamSample> _samples = new();
         private readonly ConcurrentQueue<MediaStreamSample> _encodeSamples = new();
+
+        public static VideoEncodingProperties TelloVideoEncodingProperties
+        {
+            get
+            {
+                var vep = VideoEncodingProperties.CreateH264();
+                vep.Height = 720;
+                vep.Width = 960;
+                vep.Bitrate = 4 * 1024 * 1024;
+                return vep;
+            }
+        }
 
         public TelloVideoReceiver(int telloVideoPort)
         {
@@ -42,12 +52,7 @@ namespace Flight
             _telloEndPoint = new IPEndPoint(IPAddress.Any, telloVideoPort);
             _telloVideoClient.Client.ReceiveTimeout = 1000;
 
-            _vep = VideoEncodingProperties.CreateH264();
-            _vep.Height = 720;
-            _vep.Width = 960;
-            _vep.Bitrate = 5 * 1024 * 1024;
-
-            MediaStreamSource = new MediaStreamSource(new VideoStreamDescriptor(_vep));
+            MediaStreamSource = new MediaStreamSource(new VideoStreamDescriptor(TelloVideoEncodingProperties));
             MediaStreamSource.SampleRequested += MediaStreamSource_SampleRequested;
             _receiveThread = new Thread(SynchronousReceiveVideo);
         }
@@ -67,7 +72,10 @@ namespace Flight
 
         public void Quit()
         {
-            this._quitting = true;
+            _quitting.Cancel();
+            if (_receiveThread.IsAlive)
+                _receiveThread.Join();
+            _telloVideoClient.Close();
         }
 
         public void SynchronousReceiveVideo()
@@ -79,7 +87,7 @@ namespace Flight
             FileStream videoTempStream = new(MissionVideoManager.TempVideoPath, FileMode.Create, FileAccess.Write);
             BinaryWriter videoTempWriter = new(videoTempStream);
 
-            while(!_quitting)
+            while(!_quitting.IsCancellationRequested)
             {
                 TimeSpan timeIndex = this._watch.Elapsed;
                 try
@@ -111,7 +119,7 @@ namespace Flight
 
         public ConcurrentQueue<MediaStreamSample> Stop()
         {
-            _quitting = true;
+            _quitting.Cancel();
             return _encodeSamples;
         }
     }

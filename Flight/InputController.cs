@@ -14,7 +14,7 @@ namespace Flight
 
         private bool _initialized = false;
         private readonly int _pollingRateHz;
-        private readonly Thread _inputPollingThread;
+        private Thread? _inputPollingThread;
 
         public bool[]? Buttons;
         public GameControllerSwitchPosition[]? Switches;
@@ -22,9 +22,10 @@ namespace Flight
 
         public TelloApi? TargetApi;
 
+        CancellationTokenSource _quitting = new();
+
         public InputController(int pollingRateHz)
         {
-            _inputPollingThread = new Thread(PerformInputPolling);
             _pollingRateHz = pollingRateHz;
         }
 
@@ -44,6 +45,9 @@ namespace Flight
 
         public void Initialize()
         {
+            _inputPollingThread = new Thread(PerformInputPolling);
+            _quitting = new();
+
             var timeout = Task.Delay(TimeSpan.FromSeconds(10));
 
             while (!_initialized && !timeout.IsCompleted)
@@ -55,12 +59,15 @@ namespace Flight
 
         public void BeginInputPolling()
         {
-            _inputPollingThread.Start();
+            _inputPollingThread!.Start();
         }
 
         public void EndInputPolling()
         {
-            _inputPollingThread.Interrupt();
+            _quitting.Cancel();
+            _inputPollingThread?.Interrupt();
+            if(_inputPollingThread?.IsAlive ?? false)
+                _inputPollingThread.Join();
         }
 
         private async void PerformInputPolling()
@@ -68,7 +75,7 @@ namespace Flight
             int pollingRateLimitInterval = 1000 / _pollingRateHz;
             try
             {
-                while (true)
+                while (!_quitting.IsCancellationRequested)
                 {
                     var rateLimit = Task.Delay(TimeSpan.FromMilliseconds(pollingRateLimitInterval));
 

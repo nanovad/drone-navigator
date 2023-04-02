@@ -33,8 +33,10 @@ namespace Flight
 
         public event FlightStateChangedCallback FlightStateChanged;
 
-        private volatile bool _quitting = false;
+        CancellationTokenSource _quitting = new();
         public bool Connected = false;
+
+        private readonly Thread _stateThread;
 
         public TelloStateReceiver(FlightStateChangedCallback updateCallback)
         {
@@ -44,6 +46,8 @@ namespace Flight
             };
             _telloEndPoint = GenerateTelloEndPoint();
             _telloStateClient.Client.ReceiveTimeout = 500; // Milliseconds
+            _stateThread = new Thread(new ThreadStart(ConstantlyReceiveState));
+            _stateThread.Start();
             FlightStateChanged += updateCallback;
         }
 
@@ -54,13 +58,20 @@ namespace Flight
 
         public void Quit()
         {
-            _quitting = true;
+            _quitting.Cancel();
+            Connected = false;
+            _stateThread.Join();
+            _telloStateClient.Close();
+        }
+
+        public void Pause()
+        {
             Connected = false;
         }
 
         public void ConstantlyReceiveState()
         {
-            while (!_quitting)
+            while (!_quitting.IsCancellationRequested)
             {
                 if (!Connected)
                 {
@@ -97,7 +108,6 @@ namespace Flight
                     _flightState = newState;
                     FlightStateChanged?.Invoke(_flightState);
                 }
-
             }
         }
 
@@ -207,7 +217,6 @@ namespace Flight
         private readonly TelloStateReceiver _telloStateReceiver;
         private readonly TelloVideoReceiver _telloVideoReceiver;
         public TelloVideoReceiver VideoReceiver => _telloVideoReceiver;
-        private readonly Thread _stateThread;
 
         private FlightStateModel currentState;
 
@@ -216,10 +225,7 @@ namespace Flight
         public TelloApi()
         {
             _telloStateReceiver = new TelloStateReceiver(StateUpdatedCallback);
-            _stateThread = new Thread(new ThreadStart(_telloStateReceiver.ConstantlyReceiveState));
-            _stateThread.Start();
             _commandResponseClient.Client.ReceiveTimeout = 5000;
-            _commandResponseClient.Connect(_telloEndPoint);
 
             _telloVideoReceiver = new TelloVideoReceiver(VideoStreamPort);
         }
@@ -231,13 +237,28 @@ namespace Flight
         }
 
         /// <summary>
+        /// Shut down the entire Tello API object and release its resources. This ensures that network sockets are
+        /// closed and any background threads are shut down.
+        /// </summary>
+        public void Quit()
+        {
+            currentState = null;
+            _telloStateReceiver.Quit();
+            _telloVideoReceiver.Quit();
+            _commandResponseClient.Close();
+        }
+
+        /// <summary>
         /// Send a single string command to the Tello. This string will be encoded to UTF-8.
         /// </summary>
         /// <param name="command">The command to send to the Tello.</param>
         private void SendCommand(string command)
         {
             byte[] dgram = Encoding.UTF8.GetBytes(command);
-            _commandResponseClient.Send(dgram, dgram.Length);
+            if(_commandResponseClient?.Client != null
+                && _commandResponseClient.Client.Connected) {
+                _commandResponseClient.Send(dgram, dgram.Length);
+            }
         }
 
         /// <summary>
@@ -249,6 +270,8 @@ namespace Flight
         /// </returns>
         private CommandResponse SendCommandAndWaitForResponse(string command)
         {
+            if(!Connected)
+                return CommandResponse.Error;
             SendCommand(command);
             // Read the response string from the drone, convert it to a UTF-8 string, and trim trailing CRLF newlines
             string response = "";
@@ -277,6 +300,9 @@ namespace Flight
         /// </exception>
         public void StartConnection()
         {
+            // Initialize the _commandResponseClient
+            _commandResponseClient.Connect(_telloEndPoint);
+
             // Clear the current state - we will need to check for it getting updated to determine whether or not the
             // Tello is alive and connected.
             currentState = null;
@@ -313,7 +339,7 @@ namespace Flight
         public void StopConnection()
         {
             // Stop expecting state packets.
-            _telloStateReceiver.Quit();
+            _telloStateReceiver.Pause();
             // Clear the current flight state.
             currentState = null;
         }

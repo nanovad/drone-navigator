@@ -23,6 +23,7 @@ using Windows.Media.Core;
 using Windows.Media.Playback;
 using Windows.Storage;
 using CDI;
+using System.Diagnostics;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -36,7 +37,7 @@ namespace Flight
     {
         // Cdi is declared in XAML.
 
-        private readonly TelloApi api;
+        private TelloApi? api;
 
         private readonly InputController _fic = new(50);
 
@@ -57,12 +58,9 @@ namespace Flight
         public MainWindow()
         {
             this.InitializeComponent();
-            api = new();
 
             Cdi.DroneVideoElement.AutoPlay = true;
             Cdi.DroneVideoElement.MediaPlayer.RealTimePlayback = true;
-            Cdi.DroneVideoElement.Source = new MediaPlaybackItem(
-                MediaSource.CreateFromMediaStreamSource(api.VideoReceiver.MediaStreamSource));
             Cdi.DroneVideoElement.MediaPlayer.PlaybackSession.PositionChanged += delegate
             {
                 if (!_videoBegan)
@@ -72,7 +70,44 @@ namespace Flight
 
                 _videoBegan = true;
             };
-            _fic.TargetApi = api;
+        }
+
+        private ConcurrentQueue<MediaStreamSample> Cleanup()
+        {
+            // Disable the button while we attempt to shut down.
+            ConnectButton.IsEnabled = false;
+
+            _fdc.Update(Mission!);
+            Mission!.EndDateTimeOffset = DateTimeOffset.Now;
+
+            // Stop the video stream.
+            var samples = api?.StopVideo();
+
+            // Disconnect (sets the api.Connected property to false, plus performs the actual disconnection).
+            api?.StopConnection();
+
+            // Stop polling for input from the gamepad.
+            _fic.EndInputPolling();
+
+            // Clear the last frame from the video player.
+            Cdi.DroneVideoElement.Source = null;
+
+            // Save any outstanding DB changes.
+            _fdc.SaveChanges();
+
+            // Shut down all network ports and background threads.
+            api?.Quit();
+
+            // Restore the button content.
+            ConnectButton.Content = "Connect";
+
+            // Re-enable the button.
+            ConnectButton.IsEnabled = true;
+
+            // Free the API instance for later GC.
+            api = null;
+
+            return samples ?? new ConcurrentQueue<MediaStreamSample>();
         }
 
         private void MafspOnOnFlightStatusChanged(object sender, FlightStatusChangedEventArgs e)
@@ -83,34 +118,11 @@ namespace Flight
         private void ConnectButton_OnClick(object sender, RoutedEventArgs e)
         {
             // If we are currently connected, this button turns into a disconnect button, so take that action instead.
-            if(api.Connected)
+            if(api != null && api.Connected)
             {
-                _fdc.Update(Mission!);
-                Mission!.EndDateTimeOffset = DateTimeOffset.Now;
-
-                // Stop the video stream.
-                api.StopVideo();
-
-                // Disconnect (sets the api.Connected property to false, plus performs the actual disconnection).
-                api.StopConnection();
-
-                // Stop polling for input from the gamepad.
-                _fic.EndInputPolling();
-
-                // Clear the last frame from the video player.
-                Cdi.DroneVideoElement.Source = null;
-
-                // Save any outstanding DB changes.
-                _fdc.SaveChanges();
-
-                // Restore the button content.
-                ConnectButton.Content = "Connect";
+                Cleanup();
                 return;
             }
-
-            _mafsp = new MissionAwareFlightStatusProvider(api, Mission!);
-            _mafsp.OnFlightStatusChanged += MafspOnOnFlightStatusChanged;
-            Cdi.StatusProvider = _mafsp;
 
             // Create a StackPanel that will hold a ProgressRing and a TextBlock that indicates we are connecting.
             StackPanel buttonStack = new() { Orientation = Orientation.Horizontal };
@@ -134,6 +146,22 @@ namespace Flight
             // Disable the button while we attempt a connection.
             ConnectButton.IsEnabled = false;
 
+
+            api = new();
+
+            // Initialize the Tello API
+            // Pass the API's video provider to the video player
+            Cdi.DroneVideoElement.Source = new MediaPlaybackItem(
+                MediaSource.CreateFromMediaStreamSource(api.VideoReceiver.MediaStreamSource));
+            // Set the FlightInputController's target API (to send commands via) to the new TelloAPI instance
+            _fic.TargetApi = api;
+
+            // Wire the MAFSP to the freshly initialized API.
+            _mafsp = new MissionAwareFlightStatusProvider(api, Mission!);
+            // Hook the flight status changed event
+            _mafsp.OnFlightStatusChanged += MafspOnOnFlightStatusChanged;
+            Cdi.StatusProvider = _mafsp;
+
             Task.Run(() =>
             {
                 try
@@ -156,6 +184,7 @@ namespace Flight
                         {
                             BadControllerInfoBar.IsOpen = true;
                             BadControllerInfoBar.Message = cnfe.Message;
+                            _fic.EndInputPolling();
                         });
                     }
 
@@ -170,17 +199,18 @@ namespace Flight
                         Cdi.DroneVideoElement.MediaPlayer.Play();
                         _fdc.Update(Mission!);
                         Mission!.StartDateTimeOffset = DateTimeOffset.Now;
+                        _missionVideoToEncode = true;
                     });
 
                 }
                 catch(TelloConnectionException)
                 {
                     // If StartConnection() did throw an exception, then we are not connected - reset the control to
-                    // its original state and show the connection failure InfoBar.
+                    // its original state, clean up the connections and threads, and show the connection failure
+                    // InfoBar.
                     _dq.TryEnqueue(() =>
                     {
-                        ConnectButton.Content = "Connect";
-                        ConnectButton.IsEnabled = true;
+                        Cleanup();
                         ConnectionFailedInfoBar.IsOpen = true;
                         BadControllerInfoBar.IsOpen = false;
                     });
@@ -190,13 +220,13 @@ namespace Flight
 
         private void TakeoffButton_OnClick(object sender, RoutedEventArgs e)
         {
-            if(api.Connected)
+            if(api?.Connected ?? false)
                 api.Takeoff();
         }
 
         private void LandButton_OnClick(object sender, RoutedEventArgs e)
         {
-            if(api.Connected)
+            if(api?.Connected ?? false)
                 api.Land();
         }
 
@@ -211,26 +241,8 @@ namespace Flight
                 return;
             }
 
-            var queue = new ConcurrentQueue<MediaStreamSample>();
-
-            if (api.Connected)
-            {
-                queue = api.StopVideo();
-                _fdc.Update(Mission!);
-                //Mission!.EndDateTimeOffset = DateTimeOffset.Now;
-            }
-            api.StopConnection();
-
-            // Track if any video was actually recorded - if not, there is nothing to encode.
-            if (!_missionVideoToEncode)
-            {
-                FlightFinished?.Invoke(this, EventArgs.Empty);
-                return;
-            }
-
-            // Save any changes (probably FlightState) to the database.
-            _fdc.SaveChanges();
-
+            // Perform shutdown of all background tasks, threads, and connections.
+            var queue = Cleanup();
             // At this point, we have a mission video that needs to be encoded.
 
             // Prevent the window from automatically closing.
@@ -256,11 +268,20 @@ namespace Flight
             if (!File.Exists(MissionVideoManager.TempVideoPath))
                 throw new FileNotFoundException("Unable to find mission video file");
 
-            mep.StartEncoding(
-                queue,
-                api.VideoReceiver.VideoEncodingProperties,
-                MissionVideoManager.GetMissionVideoPath(Mission!));
-            await mepd.ShowAsync();
+            if (_missionVideoToEncode && !queue.IsEmpty)
+            {
+                mep.StartEncoding(
+                    queue,
+                    TelloVideoReceiver.TelloVideoEncodingProperties,
+                    MissionVideoManager.GetMissionVideoPath(Mission!));
+                await mepd.ShowAsync();
+            }
+            else
+            {
+                FlightFinished?.Invoke(this, EventArgs.Empty);
+                // Allow the window to close properly.
+                args.Handled = false;
+            }
         }
     }
 }
