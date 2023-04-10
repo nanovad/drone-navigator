@@ -16,6 +16,7 @@
   </PropertyGroup>
   <ItemGroup>
     <None Remove="DroneListPage.xaml" />
+    <None Remove="DroneStats.xaml" />
     <None Remove="EditDroneDialog.xaml" />
     <None Remove="MissionListPage.xaml" />
     <None Remove="StartNewMissionDialog.xaml" />
@@ -55,6 +56,11 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Themes\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="DroneStats.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Page Update="EditDroneDialog.xaml">

@@ -91,5 +91,18 @@ namespace DroneNavigator
                 RefreshList();
             }
         }
+
+        private async void AnalyticsButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            DroneStats ds = new(fdc, ((e.OriginalSource as Button).DataContext as DroneModel).Id);
+
+            ContentDialog cd = new();
+            cd.XamlRoot = this.Content.XamlRoot;
+            cd.Title = "Analytics";
+            cd.Content = ds;
+            cd.CloseButtonText = "Close";
+
+            await cd.ShowAsync();
+        }
     }
 }
