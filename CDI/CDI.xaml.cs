@@ -30,6 +30,8 @@ namespace CDI
         private DispatcherQueue _dq = DispatcherQueue.GetForCurrentThread();
         internal FlightStatusController Fsc;
 
+        private volatile float initialBaroAlt = 0.0f;
+
         private IFlightStatusProvider _statusProvider;
         public IFlightStatusProvider StatusProvider
         {
@@ -64,12 +66,16 @@ namespace CDI
         private void FlightStatusChangedEventHandler(object sender, FlightStatusChangedEventArgs e)
         {
             FlightStateModel state = e.FlightState;
+            if(initialBaroAlt < 0.1f && initialBaroAlt > -0.1f) {
+                initialBaroAlt = e.FlightState.BarometricAltitude;
+            }
             _dq.TryEnqueue(() =>
             {
                 RefreshMet(state);
                 RefreshSnr(state);
                 RefreshBattery(state);
                 RefreshSpeed(state);
+                RefreshDistance(state);
                 RefreshAltitude(state);
             });
         }
@@ -97,12 +103,24 @@ namespace CDI
             double dmsSpeedAbs = v.Length();
             double cmsSpeedAbs = dmsSpeedAbs * 10;
             double mphSpeedAbs = cmsSpeedAbs * 0.022369362912;
-            this.SpeedTextBlock.Text = $"{mphSpeedAbs:f2} MPH";
+            this.SpeedTextBlock.Text = $"{mphSpeedAbs:f2}MPH";
+        }
+
+        private void RefreshDistance(FlightStateModel state)
+        {
+            float distanceCm = state.TotalDistance;
+            float distanceFt = distanceCm * 0.0328084f; // Conversion factor cm->ft
+            this.TotalDistanceTextBlock.Text = $"{distanceFt:f2}ft";
         }
 
         private void RefreshAltitude(FlightStateModel state)
         {
-            this.AltitudeTextBlock.Text = $"Altitude: {state.Altitude}";
+            float altFt = state.Altitude * 0.0328084f; // Conversion factor cm->ft
+            this.VsAltitudeTextBlock.Text = $"VS: {altFt:f2}ft";
+
+            // Calibrate the takeoff point to be tared with the initialBaroAlt, which aligns better with VS altitude.
+            float baroAltFt = (state.BarometricAltitude - initialBaroAlt)  * 3.28084f;
+            this.BaroAltitudeTextBlock.Text = $"Baro: {baroAltFt:f2}ft";
         }
     }
 }

@@ -17,7 +17,7 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="200"/>
+                    <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
@@ -36,21 +36,78 @@
                     <!-- See https://learn.microsoft.com/en-us/windows/apps/design/style/segoe-ui-symbol-font for -->
                     <!-- a list of these glyphs. -->
                     <!-- Signal icon - defaults to E871 (SignalNotConnected) -->
-                    <FontIcon x:Name="SignalIcon" Glyph="&#xE871;" FontSize="24pt" Margin="0,0,8,0"></FontIcon>
+                    <!--<FontIcon x:Name="SignalIcon" Glyph="&#xE871;" FontSize="24pt" Margin="0,0,8,0"></FontIcon>-->
                     <!-- Battery icon - defaults to E996 (BatteryUnknown) -->
-                    <FontIcon x:Name="BatteryIcon" Glyph="&#xE996;" FontSize="24pt" Margin="8,0,8,0"></FontIcon>
-                    <TextBlock x:Name="BatteryTextBlock" Margin="8">null</TextBlock>
+                    <FontIcon x:Name="BatteryIcon" Glyph="&#xE996;" FontSize="40" VerticalAlignment="Center" Margin="0,0,8,0"></FontIcon>
+                    <TextBlock x:Name="BatteryTextBlock" FontSize="16" VerticalAlignment="Top" Margin="8">null</TextBlock>
                 </StackPanel>
 
                 <!-- CAVI - command, attitude and velocity indicator + total speed row -->
                 <StackPanel x:Name="CvaSpeedPanel" Orientation="Horizontal" Grid.Row="2">
                     <!-- [placeholder for CAVI control] -->
-                    <TextBlock x:Name="SpeedTextBlock">0.00MPH</TextBlock>
                 </StackPanel>
 
-                <TextBlock x:Name="TotalDistanceTextBlock" Grid.Row="3">Total distance: </TextBlock>
+                <Grid Grid.Row="3">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="2*" />
+                        <ColumnDefinition Width="2*" />
+                        <ColumnDefinition Width="3*" />
+                    </Grid.ColumnDefinitions>
 
-                <TextBlock x:Name="AltitudeTextBlock" Grid.Row="4">Altitude: </TextBlock>
+                    <Border Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" BorderThickness="2" BorderBrush="Gray" />
+                    <Border Grid.Row="0" Grid.RowSpan="4" Grid.Column="0" BorderThickness="2" BorderBrush="Gray"/>
+                    <Border Grid.Row="0" Grid.RowSpan="4" Grid.Column="1" BorderThickness="2" BorderBrush="Gray"/>
+                    <Border Grid.Row="0" Grid.RowSpan="4" Grid.Column="2" BorderThickness="2" BorderBrush="Gray"/>
+
+                    <TextBlock x:Name="SpeedHeaderTextBlock"
+                               Grid.Row="0" Grid.Column="0"
+                               FontSize="18"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"
+                               Margin="8">Speed</TextBlock>
+                    <TextBlock x:Name="SpeedTextBlock"
+                               Grid.Row="1" Grid.Column="0"
+                               Margin="8"
+                               FontSize="16"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center">0.00MPH</TextBlock>
+
+                    <TextBlock x:Name="TotalDistanceHeaderTextBlock"
+                               Grid.Row="0" Grid.Column="1"
+                               FontSize="18"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center">Distance</TextBlock>
+                    <TextBlock x:Name="TotalDistanceTextBlock"
+                               Grid.Row="1" Grid.Column="1"
+                               Margin="8"
+                               FontSize="16"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center">0</TextBlock>
+
+                    <TextBlock x:Name="AltitudeHeaderTextBlock"
+                               Grid.Row="0" Grid.Column="2"
+                               FontSize="18"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"
+                               Margin="8">Altitude</TextBlock>
+                    <TextBlock x:Name="VsAltitudeTextBlock"
+                               Grid.Row="1" Grid.Column="2"
+                               Margin="8,0,8,0"
+                               FontSize="16"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center">0</TextBlock>
+                    <TextBlock x:Name="BaroAltitudeTextBlock"
+                               Grid.Row="2" Grid.Column="2"
+                               Margin="8,0,8,8"
+                               FontSize="16"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center">Baro: 0</TextBlock>
+                </Grid>
 
                 <!-- Placeholder for warning indicator control -->
             </Grid>
