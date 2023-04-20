@@ -50,7 +50,14 @@ namespace FlightDataModel
         public DateTimeOffset EndDateTimeOffset { get; set; }
         public float Distance { get; set; }
         [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
-        public TimeSpan Duration { get => EndDateTimeOffset - StartDateTimeOffset; }
+        public TimeSpan Duration {
+            get {
+                if(EndDateTimeOffset < StartDateTimeOffset)
+                    return TimeSpan.Zero;
+                else
+                    return EndDateTimeOffset - StartDateTimeOffset;
+            }
+        }
     }
 
     public class CommandModel
