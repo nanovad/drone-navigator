@@ -94,11 +94,12 @@ namespace DroneNavigator
 
         private async void AnalyticsButton_OnClick(object sender, RoutedEventArgs e)
         {
-            DroneStats ds = new(fdc, ((e.OriginalSource as Button).DataContext as DroneModel).Id);
+            DroneModel drone = (e.OriginalSource as Button).DataContext as DroneModel;
+            DroneStats ds = new(fdc, drone.Id);
 
             ContentDialog cd = new();
             cd.XamlRoot = this.Content.XamlRoot;
-            cd.Title = "Analytics";
+            cd.Title = "Analytics - " + drone.Name;
             cd.Content = ds;
             cd.CloseButtonText = "Close";
 
