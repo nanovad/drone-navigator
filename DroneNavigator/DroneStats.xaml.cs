@@ -53,8 +53,9 @@ namespace DroneNavigator
         {
             dsvm = await DroneStatsViewModel.Calculate(_fdc, _droneId);
 
-            AverageDistanceFlownTextBlock.Text = $"{dsvm.AverageDistanceFlown:F1}cm";
+            MaxBarometricAltitude.Text = $"{dsvm.MaxAltitudeFlown:F1}cm";
             AverageTimeFlownTextBlock.Text = dsvm?.AverageTimeFlown.ToString("hh\\:mm\\:ss\\.fff") ?? "";
+            CumulativeTimeFlownTextBlock.Text = dsvm?.AverageTimeFlown.ToString("dd\\:hh\\:mm\\:ss") ?? "";
 
             LoadingProgressRing.Visibility = Visibility.Collapsed;
             MainGrid.Visibility = Visibility.Visible;

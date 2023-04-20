@@ -10,8 +10,9 @@ namespace DroneNavigator
 {
     internal class DroneStatsViewModel
     {
-        public float AverageDistanceFlown { get; private set; }
+        public float MaxAltitudeFlown { get; private set; }
         public TimeSpan AverageTimeFlown { get; private set; }
+        public TimeSpan CumulativeTimeFlown { get; private set; }
 
         private DroneStatsViewModel()
         {
@@ -26,14 +27,26 @@ namespace DroneNavigator
 
             DroneStatsViewModel ds = new();
 
+            List<MissionModel> dronesMissions = await c.Missions.Where(
+                m => m.Drone == drone.Id)
+                .ToListAsync();
+
             // Calculate average time flown
             ds.AverageTimeFlown = TimeSpan.FromSeconds(
-                await c.Missions.Where(m => m.Drone == drone.Id).ToListAsync().ContinueWith(
-                    t => t.Result.Average(m => m.Duration.TotalSeconds)));
+                dronesMissions.Average(m => m.Duration.TotalSeconds));
 
-            // Calculate average distance flown
-            /*ds.AverageDistanceFlown = await c.Missions.Where(m => m.Drone == drone.Id)
-                .AverageAsync(m => m.Distance);*/
+            // Calculate highest barometric altitude
+            foreach(MissionModel m in dronesMissions) {
+                var relFlightStates = await c.FlightStates.Where(f => f.Mission == m.Id).ToListAsync();
+                if(relFlightStates.Any()) {
+                    var maxAlt = relFlightStates.Max(t => t.BarometricAltitude);
+                    ds.MaxAltitudeFlown = Math.Max(ds.MaxAltitudeFlown, maxAlt);
+                }
+            }
+
+            TimeSpan cumulative = TimeSpan.Zero;
+            dronesMissions.ForEach(m => cumulative.Add(m.Duration));
+            ds.CumulativeTimeFlown = cumulative;
 
             return ds;
         }

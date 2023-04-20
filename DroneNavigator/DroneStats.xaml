@@ -21,17 +21,21 @@
             <Grid.RowDefinitions>
                 <RowDefinition>Auto</RowDefinition>
                 <RowDefinition>Auto</RowDefinition>
+                <RowDefinition>Auto</RowDefinition>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition>Auto</ColumnDefinition>
                 <ColumnDefinition>Auto</ColumnDefinition>
             </Grid.ColumnDefinitions>
 
-            <TextBlock Grid.Column="0" Grid.Row="0" Text="Average distance flown: " Margin="8"/>
-            <TextBlock x:Name="AverageDistanceFlownTextBlock" Grid.Column="1" Grid.Row="0" Text="{x:Bind AverageDistanceFlown, Mode=OneWay}" Margin="8"/>
+            <TextBlock Grid.Column="0" Grid.Row="0" Text="Maximum altitude (barometric): " Margin="8" />
+            <TextBlock x:Name="MaxBarometricAltitude" Grid.Column="1" Grid.Row="0" Text="" Margin="8" />
 
-            <TextBlock Grid.Column="0" Grid.Row="1" Text="Average time flown: " Margin="8"/>
+            <TextBlock Grid.Column="0" Grid.Row="1" Text="Average time flown: " Margin="8" />
             <TextBlock x:Name="AverageTimeFlownTextBlock" Grid.Column="1" Grid.Row="1" Text="{x:Bind AverageTimeFlown, Mode=OneWay}" Margin="8"/>
+
+            <TextBlock Grid.Column="0" Grid.Row="2" Text="Cumulative time flown: " Margin="8" />
+            <TextBlock x:Name="CumulativeTimeFlownTextBlock" Grid.Column="1" Grid.Row="2" Text="" Margin="8" />
         </Grid>
     </StackPanel>
 </Page>
