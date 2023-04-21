@@ -33,6 +33,7 @@ namespace DroneNavigator
         {
             this.InitializeComponent();
             MainNavigationView.SelectedItem = MainNavigationView.MenuItems.ElementAt(0);
+            this.Title = "Drone Navigator";
         }
 
         private void MainNavigationView_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)

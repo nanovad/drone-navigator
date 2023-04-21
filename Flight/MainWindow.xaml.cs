@@ -70,6 +70,8 @@ namespace Flight
 
                 _videoBegan = true;
             };
+
+            this.Title = "Drone Navigator - Flight";
         }
 
         private ConcurrentQueue<MediaStreamSample> Cleanup()
