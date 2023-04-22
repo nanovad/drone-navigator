@@ -1,5 +1,13 @@
-// Copyright (c) Microsoft Corporation and Contributors.
-// Licensed under the MIT License.
+// MissionListPage
+// A page that displays a list of missions from the database, their summary information, and buttons for starting a new
+// mission or reviewing a given mission.
+// This Page is used by the main navigation frame.
+
+// By Nicholas De Nova
+// For CPSC-4900 Senior Project & Seminar
+// With Professor Freddie Kato
+// At Governors State University
+// In Spring 2023
 
 using System;
 using System.Collections.Generic;
@@ -17,9 +25,6 @@ using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Navigation;
 using FlightDataModel;
 using Microsoft.EntityFrameworkCore;
-
-// To learn more about WinUI, the WinUI project structure,
-// and more about our project templates, see: http://aka.ms/winui-project-info.
 
 namespace DroneNavigator
 {

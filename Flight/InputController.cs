@@ -1,4 +1,16 @@
-﻿using System;
+﻿// InputController
+// A background thread for processing information being received by a game controller and passing the pilot's inputs
+// on to the drone in the proper format.
+// This class is currently tightly coupled to the TelloApi class for simplicity, but a future improvement is planned to
+// decouple these classes via an interface.
+
+// By Nicholas De Nova
+// For CPSC-4900 Senior Project & Seminar
+// With Professor Freddie Kato
+// At Governors State University
+// In Spring 2023
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;

@@ -1,4 +1,15 @@
-﻿using System;
+﻿// MissionAwareFlightStatusProvider
+// A class which injects the current mission into flight state instances received from the drone, as the API is unaware
+// of the ongoing mission, and the UI and database expect the context of the current mission to be contained in each
+// of those FlightStates.
+
+// By Nicholas De Nova
+// For CPSC-4900 Senior Project & Seminar
+// With Professor Freddie Kato
+// At Governors State University
+// In Spring 2023
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;

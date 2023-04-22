@@ -1,5 +1,13 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
-// Licensed under the MIT License. See LICENSE in the project root for license information.
+// MainWindow
+// The main window of the Review module, which contains a CDI control that is driven by previously saved mission data
+// and video. The video contains familiar playback controls, and the CDI's drone data display synchronizes to that.
+// See ReplaySynchronizer for more details.
+
+// By Nicholas De Nova
+// For CPSC-4900 Senior Project & Seminar
+// With Professor Freddie Kato
+// At Governors State University
+// In Spring 2023
 
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -18,9 +26,6 @@ using Windows.Foundation.Collections;
 using Windows.Media.Core;
 using Windows.Media.Playback;
 using FlightDataModel;
-
-// To learn more about WinUI, the WinUI project structure,
-// and more about our project templates, see: http://aka.ms/winui-project-info.
 
 namespace Review
 {

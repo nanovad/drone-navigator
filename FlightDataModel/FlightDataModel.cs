@@ -1,4 +1,15 @@
-﻿using System;
+﻿// FlightDataModel
+// Data definitions for the entities contained in Drone Navigator's database, as well as hints to Entity Framework Core
+// from which a database definition can be built. Entity Framework Core handles most of the lifting related to database
+// accesses through the FlightDataContext class, allowing me to use a declarative approach to data modeling here.
+
+// By Nicholas De Nova
+// For CPSC-4900 Senior Project & Seminar
+// With Professor Freddie Kato
+// At Governors State University
+// In Spring 2023
+
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;

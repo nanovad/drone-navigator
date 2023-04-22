@@ -1,4 +1,15 @@
-﻿using System;
+﻿// TelloApi
+// The interface between Drone Navigator and the Tello drone, providing an idiomatic C# interface to the Tello API as
+// documented by DJI. Future improvements are planned to decouple this class from the other components of the Flight
+// sub-project so that more models of drones can be supported.
+
+// By Nicholas De Nova
+// For CPSC-4900 Senior Project & Seminar
+// With Professor Freddie Kato
+// At Governors State University
+// In Spring 2023
+
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;

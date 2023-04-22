@@ -1,5 +1,12 @@
-// Copyright (c) Microsoft Corporation and Contributors.
-// Licensed under the MIT License.
+// EditDroneDialog
+// A dialog that presents a simple interface for modifying properties of a given drone in the database.
+// This dialog is also used when creating a drone.
+
+// By Nicholas De Nova
+// For CPSC-4900 Senior Project & Seminar
+// With Professor Freddie Kato
+// At Governors State University
+// In Spring 2023
 
 using FlightDataModel;
 using Microsoft.UI.Xaml;
@@ -16,9 +23,6 @@ using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
-
-// To learn more about WinUI, the WinUI project structure,
-// and more about our project templates, see: http://aka.ms/winui-project-info.
 
 namespace DroneNavigator
 {

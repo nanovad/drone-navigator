@@ -1,4 +1,14 @@
-﻿using System;
+﻿// DroneStatsViewModel
+// A class following the ViewModel pattern that calculates statistics for a given drone from the database for use in
+// UI elements that display the results of those calculations.
+
+// By Nicholas De Nova
+// For CPSC-4900 Senior Project & Seminar
+// With Professor Freddie Kato
+// At Governors State University
+// In Spring 2023
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;

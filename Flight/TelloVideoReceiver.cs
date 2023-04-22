@@ -1,4 +1,15 @@
-﻿using Microsoft.UI.Xaml;
+﻿// TelloVideoReceiver
+// The class that receives video from the Tello in real time and displays it in the CDI's MediaPlayerElement, which
+// ultimately provides a live view of the drone's camera to the pilot. This class also buffers video received from the
+// drone in memory for later transcoding.
+
+// By Nicholas De Nova
+// For CPSC-4900 Senior Project & Seminar
+// With Professor Freddie Kato
+// At Governors State University
+// In Spring 2023
+
+using Microsoft.UI.Xaml;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;

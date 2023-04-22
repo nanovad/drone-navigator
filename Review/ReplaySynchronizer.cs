@@ -1,4 +1,16 @@
-﻿using System;
+﻿// ReplaySynchronizer
+// Synchronizes flight states as displayed in the CDI during mission review.
+// Timing and controls here are primarily driven by the MediaPlayerElement displaying the mission video, as its native
+// controls will be most familiar to the user. Additionally, simply keeping the flight data in sync with the video's
+// position ensures that seeking and playback rate changes will not cause desynchronization issues.
+
+// By Nicholas De Nova
+// For CPSC-4900 Senior Project & Seminar
+// With Professor Freddie Kato
+// At Governors State University
+// In Spring 2023
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;

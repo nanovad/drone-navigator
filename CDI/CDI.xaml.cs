@@ -1,5 +1,17 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
-// Licensed under the MIT License. See LICENSE in the project root for license information.
+// CDI
+// The Common Drone Interface, a shared control between the Flight and Review modules.
+// This module provides the bulk of the Flight and Review interfaces. Its embedded MediaPlayerElement is exposed to
+// other controls so that they can provide video either live from the drone or from a previous mission's video file.
+// The rest of the controls pertain to quantitative flight data, and display information such as the mission elapsed
+// time (or MET), speed, altitude, remaining battery, and other important data received from the drone as it flies.
+// It is designed to be source-agnostic, which allows it to be reused by both Flight, which provides data in real time,
+// and Review, which provides data synchronized to the mission video. (See Review.ReplaySynchronizer).
+
+// By Nicholas De Nova
+// For CPSC-4900 Senior Project & Seminar
+// With Professor Freddie Kato
+// At Governors State University
+// In Spring 2023
 
 using FlightDataModel;
 using Microsoft.UI.Xaml;
@@ -19,9 +31,6 @@ using System.Text;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Microsoft.UI.Dispatching;
-
-// To learn more about WinUI, the WinUI project structure,
-// and more about our project templates, see: http://aka.ms/winui-project-info.
 
 namespace CDI
 {

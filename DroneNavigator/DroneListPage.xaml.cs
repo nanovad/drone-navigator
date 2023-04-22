@@ -1,5 +1,13 @@
-// Copyright (c) Microsoft Corporation and Contributors.
-// Licensed under the MIT License.
+// DroneListPage.xaml.cs
+// A UI page showing a list of drones retrieved from the database, as well as buttons to view full statistics for a
+// selected drone, create a new drone, or edit information about a drone.
+// This Page is used by the main navigation frame.
+
+// By Nicholas De Nova
+// For CPSC-4900 Senior Project & Seminar
+// With Professor Freddie Kato
+// At Governors State University
+// In Spring 2023
 
 using System;
 using System.Collections.Generic;
@@ -19,9 +27,6 @@ using FlightDataModel;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.UI.Dispatching;
 using Windows.Services.Maps;
-
-// To learn more about WinUI, the WinUI project structure,
-// and more about our project templates, see: http://aka.ms/winui-project-info.
 
 namespace DroneNavigator
 {

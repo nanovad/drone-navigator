@@ -1,5 +1,12 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
-// Licensed under the MIT License. See LICENSE in the project root for license information.
+// MainWindow
+// The Flight module's main window, containing buttons for connecting to the drone, taking off, and landing, and the
+// CDI, which displays information (data and video) received from the drone in real time.
+
+// By Nicholas De Nova
+// For CPSC-4900 Senior Project & Seminar
+// With Professor Freddie Kato
+// At Governors State University
+// In Spring 2023
 
 using FlightDataModel;
 using Microsoft.UI.Xaml;
@@ -24,9 +31,6 @@ using Windows.Media.Playback;
 using Windows.Storage;
 using CDI;
 using System.Diagnostics;
-
-// To learn more about WinUI, the WinUI project structure,
-// and more about our project templates, see: http://aka.ms/winui-project-info.
 
 namespace Flight
 {

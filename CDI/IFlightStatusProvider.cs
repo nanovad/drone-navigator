@@ -1,4 +1,12 @@
-﻿using System;
+﻿// IFlightStatusProvider.cs
+// A generic interface for classes streaming flight status data updates via callbacks.
+// By Nicholas De Nova
+// For CPSC-4900 Senior Project & Seminar
+// With Professor Freddie Kato
+// At Governors State University
+// In Spring 2023
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;

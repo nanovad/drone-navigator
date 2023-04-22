@@ -1,5 +1,12 @@
-// Copyright (c) Microsoft Corporation and Contributors.
-// Licensed under the MIT License.
+// MissionEncodingPage
+// A Page for embedding in a ContentDialog that triggers after a mission is complete, kicking off the mission video
+// transcoding process and displaying its progress.
+
+// By Nicholas De Nova
+// For CPSC-4900 Senior Project & Seminar
+// With Professor Freddie Kato
+// At Governors State University
+// In Spring 2023
 
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -26,9 +33,6 @@ using FFMpegCore.Enums;
 using FlightDataModel;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Windowing;
-
-// To learn more about WinUI, the WinUI project structure,
-// and more about our project templates, see: http://aka.ms/winui-project-info.
 
 namespace Flight
 {

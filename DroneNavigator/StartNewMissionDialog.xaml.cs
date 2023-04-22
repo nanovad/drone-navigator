@@ -1,5 +1,12 @@
-// Copyright (c) Microsoft Corporation and Contributors.
-// Licensed under the MIT License.
+// StartMissionDialog
+// A Page that is embedded in a ContentDialog and displayed to the user when they choose to start a new mission,
+// gathering needed information such as the drone to be used, mission name, and a description.
+
+// By Nicholas De Nova
+// For CPSC-4900 Senior Project & Seminar
+// With Professor Freddie Kato
+// At Governors State University
+// In Spring 2023
 
 using System;
 using System.Collections.Generic;

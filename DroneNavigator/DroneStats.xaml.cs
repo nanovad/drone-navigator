@@ -1,5 +1,11 @@
-// Copyright (c) Microsoft Corporation and Contributors.
-// Licensed under the MIT License.
+// DroneStats
+// A page designed for use in ContentDialogs that displays statistics calculated for a specific drone.
+
+// By Nicholas De Nova
+// For CPSC-4900 Senior Project & Seminar
+// With Professor Freddie Kato
+// At Governors State University
+// In Spring 2023
 
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -18,10 +24,6 @@ using Windows.Foundation.Collections;
 using ABI.Microsoft.Web.WebView2.Core;
 using FlightDataModel;
 using Microsoft.UI.Dispatching;
-
-// To learn more about WinUI, the WinUI project structure,
-// and more about our project templates, see: http://aka.ms/winui-project-info.
-
 namespace DroneNavigator
 {
     /// <summary>
