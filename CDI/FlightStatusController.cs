@@ -19,6 +19,9 @@ using Microsoft.EntityFrameworkCore.Sqlite.Query.Internal;
 
 namespace CDI
 {
+    /// <summary>
+    /// DEPRECATED: A component of the CDI obsoleted by the IFlightStatusProvider interface.
+    /// </summary>
     internal class FlightStatusController : IFlightStatusProvider
     {
         private FlightStateModel PreviousState;

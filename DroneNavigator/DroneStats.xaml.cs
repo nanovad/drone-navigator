@@ -27,7 +27,7 @@ using Microsoft.UI.Dispatching;
 namespace DroneNavigator
 {
     /// <summary>
-    /// An empty page that can be used on its own or navigated to within a Frame.
+    /// A page designed for use in ContentDialogs that displays statistics calculated for a specific drone.
     /// </summary>
     public sealed partial class DroneStats : Page
     {
@@ -41,11 +41,22 @@ namespace DroneNavigator
         private readonly int _droneId;
         private readonly FlightDataContext _fdc;
 
+        /// <summary>
+        /// Create a new instance of the DroneStats page. This prepares the page to calculate the statistics, but no DB
+        /// accesses are performed until the Page is actually loaded by the interface and
+        /// <see cref="DroneStats_OnLoaded"/> is called.
+        /// </summary>
+        /// <param name="fdc">An existing, open FlightDataContext object.</param>
+        /// <param name="droneId">The ID of the drone to calculate statistics for.</param>
         public DroneStats(FlightDataContext fdc, int droneId)
         {
             this.InitializeComponent();
 
+            // Initialize the stats strings with test values.
             AverageDistanceFlown = "asdf";
+            // Initialize the database connection; this connection is the one already in use by DroneListPage, but it
+            // should not cause concurrency problems, as no actions can be taken in that user interface until this
+            // dialog is closed.
             _fdc = fdc;
             _droneId = droneId;
         }
@@ -53,13 +64,22 @@ namespace DroneNavigator
 
         private async void DroneStats_OnLoaded(object sender, RoutedEventArgs e)
         {
+            // Now that the page is ready, begin calculating statistics.
+            // Note that the text boxes here are not yet visible because the MainGrid containing them is initialized
+            // from XAML with their Visibility property set to Collapsed.
+            // Instead, only a ProgresssRing is shown, which must be hidden when the calculation completes.
+            
+            // Actually perform calculation of the stats from the DB.
             dsvm = await DroneStatsViewModel.Calculate(_fdc, _droneId);
 
+            // Format the strings nicely.
             MaxBarometricAltitude.Text = $"{dsvm.MaxAltitudeFlown:F1}cm";
             AverageTimeFlownTextBlock.Text = dsvm?.AverageTimeFlown.ToString("hh\\:mm\\:ss\\.fff") ?? "";
             CumulativeTimeFlownTextBlock.Text = dsvm?.AverageTimeFlown.ToString("dd\\:hh\\:mm\\:ss") ?? "";
 
+            // Hide the ProgressRing that indicates to the user that work is ongoing.
             LoadingProgressRing.Visibility = Visibility.Collapsed;
+            // And show the MainGrid containing the stats text boxes.
             MainGrid.Visibility = Visibility.Visible;
         }
     }

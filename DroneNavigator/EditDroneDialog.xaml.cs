@@ -27,10 +27,16 @@ using Windows.Foundation.Collections;
 namespace DroneNavigator
 {
     /// <summary>
-    /// An empty page that can be used on its own or navigated to within a Frame.
+    /// A dialog that presents a simple interface for modifying properties of a given drone in the database.
+    /// This dialog is also used when creating a drone.
     /// </summary>
     public sealed partial class EditDroneDialog : ContentDialog
     {
+        /// <summary>
+        /// Set to a DroneModel to prefill the fields of this dialog with values from a given drone. Note that this
+        /// means this dialog box will act as an "edit" dialog, where the values that are changed will be committed
+        /// back to the original drone object when the Save button is pressed.
+        /// </summary>
         public DroneModel? Prefill { get; set; }
 
         public EditDroneDialog() : base()
@@ -38,6 +44,10 @@ namespace DroneNavigator
             this.InitializeComponent();
         }
 
+        /// <summary>
+        /// Shows the dialog.
+        /// </summary>
+        /// <returns>An asynchronous object containing a ContentDialogResult indicating what action the user took.</returns>
         public new IAsyncOperation<ContentDialogResult> ShowAsync()
         {
             // TODO: Should we use DataContext?
@@ -49,8 +59,12 @@ namespace DroneNavigator
             return base.ShowAsync();
         }
 
+        /// <summary>
+        /// Event handler for the dialog's "Save" button click.
+        /// </summary>
         private void NewDroneDialog_PrimaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
         {
+            // Build a list of validation errors.
             List<string> errors = new();
             if(string.IsNullOrWhiteSpace(DroneNameTextBox.Text))
                 errors.Add("drone name cannot be empty or only whitespace");
@@ -59,8 +73,11 @@ namespace DroneNavigator
             if(string.IsNullOrWhiteSpace(DroneModelTextBox.Text))
                 errors.Add("drone model cannot be empty or only whitespace");
 
+            // If there are no errors, we can save the drone.
             if(errors.Count == 0)
             {
+                // If the Prefill field was set, we can set our drone instance to that reference.
+                // Otherwise, we'll need to create a new drone object.
                 DroneModel? drone = Prefill switch {
                     null => new(),
                     _ => Prefill
@@ -69,7 +86,11 @@ namespace DroneNavigator
                 drone.Make = DroneMakeTextBox.Text;
                 drone.Model = DroneModelTextBox.Text;
 
+                // Open a new connection to the database.
                 FlightDataContext fdc = new();
+                // "Update" the record. If the record does not exist (i.e., it was freshly created, which occurs when
+                // Prefill was null, a new record is created here.
+                // Otherwise, the values changed during the edit operation are saved to the existing drone record.
                 fdc.Update(drone);
                 fdc.SaveChanges();
                 return;
@@ -80,6 +101,7 @@ namespace DroneNavigator
             errors[0] = char.ToUpper(errors[0][0]) + errors[0][1..];
             ValidationMessageTextBox.Text = string.Join(", ", errors);
             ValidationMessageTextBox.Visibility = Visibility.Visible;
+            // Prevent the dialog from closing.
             args.Cancel = true;
         }
     }

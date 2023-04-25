@@ -31,7 +31,9 @@ using Windows.Services.Maps;
 namespace DroneNavigator
 {
     /// <summary>
-    /// An empty page that can be used on its own or navigated to within a Frame.
+    /// A Page showing a list of drones retrieved from the database, as well as buttons to view full statistics for a
+    /// selected drone, create a new drone, or edit information about a drone.
+    /// This Page is intended for use by the main window's navigation frame.
     /// </summary>
     public sealed partial class DroneListPage : Page
     {
@@ -49,6 +51,10 @@ namespace DroneNavigator
             RefreshList();
         }
 
+        /// <summary>
+        /// Refreshes the ListItem, which is the main component of this page, with a fresh list of drones received from
+        /// the database.
+        /// </summary>
         private void RefreshList()
         {
             fdc.Drones.ToListAsync().ContinueWith(
@@ -56,25 +62,48 @@ namespace DroneNavigator
                     () => DronesListView.ItemsSource = items.Result));
         }
 
+        /// <summary>
+        /// Event handler for the "New Drone" button click.
+        /// This spawns a dialog which allows the user to create a new drone with specified details or cancel the
+        /// operation.
+        /// </summary>
         private async void NewDroneButton_Click(object sender, RoutedEventArgs e)
         {
+            // Spawn the EditDroneDialog, which does dual duty for creating drones.
             EditDroneDialog edd = new();
             edd.XamlRoot = this.Content.XamlRoot;
+
+            // Refresh the drone list when the drone is created.
             if(await edd.ShowAsync() == ContentDialogResult.Primary)
                 RefreshList();
+            // Other results can be ignored, as they will not make database modifications.
         }
 
+        /// <summary>
+        /// Event handler for each drone's "Edit" button click.
+        /// This spawns a dialog which allows the user to edit the selected drone.
+        /// Must be called from the DronesListView's list item data context
+        /// </summary>
         private async void EditDroneButton_Click(object sender, RoutedEventArgs e)
         {
+            // Get the drone that this ListItem was built from.
             DroneModel whichDrone = (e.OriginalSource as Button).DataContext as DroneModel;
 
+            // Spawn the EditDroneDialog prefilled with data from the drone.
             EditDroneDialog edd = new();
             edd.XamlRoot = this.Content.XamlRoot;
             edd.Prefill = whichDrone;
+
+            // Refresh the drone list when the drone is created.
             if(await edd.ShowAsync() == ContentDialogResult.Primary)
                 RefreshList();
+            // Other results can be ignored, as they will not make database modifications.
         }
 
+        /// <summary>
+        /// Event handler for each drone's "Delete" button click.
+        /// NOTE: This button is hidden and disabled in the UI, as it would violate referential integrity.
+        /// </summary>
         private async void DeleteDroneButton_Click(object sender, RoutedEventArgs e)
         {
             DroneModel whichDrone = (e.OriginalSource as Button).DataContext as DroneModel;
@@ -97,6 +126,10 @@ namespace DroneNavigator
             }
         }
 
+        /// <summary>
+        /// Event handler for each drone's analytics button click.
+        /// Spawns a DroneStats dialog which shows information about the selected drone.
+        /// </summary>
         private async void AnalyticsButton_OnClick(object sender, RoutedEventArgs e)
         {
             DroneModel drone = (e.OriginalSource as Button).DataContext as DroneModel;

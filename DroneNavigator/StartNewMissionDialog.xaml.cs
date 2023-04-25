@@ -30,7 +30,8 @@ using Microsoft.UI.Xaml.Navigation;
 namespace DroneNavigator
 {
     /// <summary>
-    /// An empty page that can be used on its own or navigated to within a Frame.
+    /// A Page that is embedded in a ContentDialog and displayed to the user when they choose to start a new mission,
+    /// gathering needed information such as the drone to be used, mission name, and a description.
     /// </summary>
     public sealed partial class StartNewMissionDialog : Page
     {

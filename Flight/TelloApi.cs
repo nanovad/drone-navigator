@@ -34,6 +34,10 @@ namespace Flight
         Error,
     }
 
+    /// <summary>
+    /// Receives state packets from the Tello over UDP and converts them to FlightStateModel objects. Events are
+    /// provided that will fire every time a new state message is received. See <see cref="FlightStateChanged"/>.
+    /// </summary>
     class TelloStateReceiver
     {
         private const int TelloStatePort = 8890;
@@ -62,11 +66,20 @@ namespace Flight
             FlightStateChanged += updateCallback;
         }
 
+        /// <summary>
+        /// Reinitializes the Tello IP endpoint object. This should be called whenever a network connection change
+        /// occurs, as new IP addresses may have been attained that can now communicate with the drone.
+        /// </summary>
+        /// <returns></returns>
         private static IPEndPoint GenerateTelloEndPoint()
         {
             return new IPEndPoint(IPAddress.Any, TelloStatePort);
         }
 
+        /// <summary>
+        /// Shuts down network connections and stops background threads. <see cref="TelloStateReceiver"/> cannot be
+        /// reused after this method is called.
+        /// </summary>
         public void Quit()
         {
             _quitting.Cancel();
@@ -75,13 +88,21 @@ namespace Flight
             _telloStateClient.Close();
         }
 
+        /// <summary>
+        /// Temporarily stop receiving state packets from a connected drone.
+        /// </summary>
         public void Pause()
         {
             Connected = false;
         }
 
+        /// <summary>
+        /// Executed by <see cref="_stateThread"/>. Continuously receives state packets from the drone and converts
+        /// them to FlightStateModel objects, then fires the <see cref="FlightStateChanged"/> event with the new state.
+        /// </summary>
         public void ConstantlyReceiveState()
         {
+            // Allow the thread to be quit by other parts of the system.
             while (!_quitting.IsCancellationRequested)
             {
                 if (!Connected)
@@ -210,6 +231,9 @@ namespace Flight
         }
     }
 
+    /// <summary>
+    /// Handles network connections and communication with the Tello drone.
+    /// </summary>
     internal class TelloApi : IFlightStatusProvider
     {
         public event IFlightStatusProvider.OnFlightStatusChangedHandler OnFlightStatusChanged;
@@ -235,9 +259,11 @@ namespace Flight
 
         public TelloApi()
         {
+            // Initialize the state message receiver class.
             _telloStateReceiver = new TelloStateReceiver(StateUpdatedCallback);
             _commandResponseClient.Client.ReceiveTimeout = 5000;
 
+            // Initialize the video receiver class.
             _telloVideoReceiver = new TelloVideoReceiver(VideoStreamPort);
         }
 
@@ -347,6 +373,10 @@ namespace Flight
             // We are connected!
         }
 
+        /// <summary>
+        /// Stops the connection to the drone temporarily, allowing it to be resumed with a call to
+        /// <see cref="StartConnection"/>.
+        /// </summary>
         public void StopConnection()
         {
             // Stop expecting state packets.
@@ -355,27 +385,49 @@ namespace Flight
             currentState = null;
         }
 
+        /// <summary>
+        /// Send a single keepalive mesage to the drone to ensure it does not close the network connection.
+        /// Currently unused.
+        /// </summary>
         public void SendKeepAlive()
         {
             SendCommand("keepalive");
         }
 
+        /// <summary>
+        /// Send a command to the drone to begin taking off. Has no effect if the drone is already in flight.
+        /// </summary>
+        /// <returns>A <see cref="CommandResponse"/> indicating whether the command succeeded or failed.</returns>
         public CommandResponse Takeoff()
         {
             return SendCommandAndWaitForResponse("takeoff");
         }
 
+        /// <summary>
+        /// Send a command to the drone to begin automatically landing. Has no effect if the drone is already landed.
+        /// </summary>
+        /// <returns>A <see cref="CommandResponse"/> indicating whether the command succeeded or failed.</returns>
         public CommandResponse Land()
         {
             return SendCommandAndWaitForResponse("land");
         }
 
+        /// <summary>
+        /// Starts the background thread that receives video from the drone, and sends a command to the drone that it
+        /// should begin streaming video.
+        /// </summary>
+        /// <returns>A <see cref="CommandResponse"/> indicating whether the command succeeded or failed.</returns>
         public CommandResponse StartVideo()
         {
             _telloVideoReceiver.Start();
             return SendCommandAndWaitForResponse("streamon");
         }
 
+        /// <summary>
+        /// Stops the background thread that receives video from the drone, and sends a command to the drone that it
+        /// should stop streaming video.
+        /// </summary>
+        /// <returns>A <see cref="CommandResponse"/> indicating whether the command succeeded or failed.</returns>
         public ConcurrentQueue<MediaStreamSample> StopVideo()
         {
             var queue = _telloVideoReceiver.Stop();
@@ -383,6 +435,13 @@ namespace Flight
             return queue;
         }
 
+        /// <summary>
+        /// Sends an RC command message to the drone, commanding the drone to move in 3D space.
+        /// </summary>
+        /// <param name="roll">Left-right movement of the drone, ranging from -100 to 100 respectively.</param>
+        /// <param name="pitch">Backward-forward movement of the drone, ranging from -100 to 100 respectively.</param>
+        /// <param name="throttle">Down-up movement of the drone, ranging from -100 to 100 respectively.</param>
+        /// <param name="yaw">Left-right rotation of the drone, ranging from -100 to 100 respectively.</param>
         public void RcControl(int roll, int pitch, int throttle, int yaw)
         {
             SendCommand($"rc {roll:D} {pitch:D} {throttle:D} {yaw:D}");

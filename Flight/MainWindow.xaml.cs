@@ -35,7 +35,8 @@ using System.Diagnostics;
 namespace Flight
 {
     /// <summary>
-    /// An empty window that can be used on its own or navigated to within a Frame.
+    /// The Flight module's main window, containing buttons for connecting to the drone, taking off, and landing, and
+    /// the CDI, which displays information (data and video) received from the drone in real time.
     /// </summary>
     public sealed partial class MainWindow : Window
     {
@@ -57,6 +58,7 @@ namespace Flight
         private bool _videoBegan = false;
 
         public event EventHandler? OnMissionVideoEncodingCompleted;
+        // Fired when transcoding has completed and the Flight module is exiting.
         public event EventHandler? FlightFinished;
 
         public MainWindow()
@@ -76,6 +78,12 @@ namespace Flight
             };
         }
 
+        /// <summary>
+        /// Disconnects from the drone, shuts down background threads for drone communication and input polling, and
+        /// releases their resources. This method also accumulates the video samples acquired by the drone and returns
+        /// them.
+        /// </summary>
+        /// <returns>Video samples recorded by the drone.</returns>
         private ConcurrentQueue<MediaStreamSample> Cleanup()
         {
             // Disable the button while we attempt to shut down.
@@ -114,11 +122,20 @@ namespace Flight
             return samples ?? new ConcurrentQueue<MediaStreamSample>();
         }
 
+        /// <summary>
+        /// Logs any incoming state packets to the database.
+        /// </summary>
         private void MafspOnOnFlightStatusChanged(object sender, FlightStatusChangedEventArgs e)
         {
             _fdc.Add(e.FlightState);
         }
 
+        /// <summary>
+        /// Event handler for the Connect button's click event. If the drone is currently connected, this will
+        /// disconnect from it. If the drone is not currently connected, it will attempt to connect.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ConnectButton_OnClick(object sender, RoutedEventArgs e)
         {
             // If we are currently connected, this button turns into a disconnect button, so take that action instead.

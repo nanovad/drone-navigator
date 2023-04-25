@@ -16,6 +16,9 @@ using System.Threading.Tasks;
 
 namespace Flight
 {
+    /// <summary>
+    /// A custom Exception thrown when the controller cannot be found during the initialization of Flight systems.
+    /// </summary>
     internal class ControllerNotFoundException : Exception
     {
         public ControllerNotFoundException() : base() { }

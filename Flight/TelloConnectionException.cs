@@ -11,6 +11,9 @@ using System;
 
 namespace Flight
 {
+    /// <summary>
+    /// Thrown when a connection attempt to a Tello drone fails.
+    /// </summary>
     [Serializable]
     internal class TelloConnectionException : Exception
     {

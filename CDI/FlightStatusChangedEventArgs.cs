@@ -16,8 +16,14 @@ using FlightDataModel;
 
 namespace CDI
 {
+    /// <summary>
+    /// A data class used for passing FlightStates to callbacks.
+    /// </summary>
     public class FlightStatusChangedEventArgs : EventArgs
     {
+        /// <summary>
+        /// The flight state object that the event contains.
+        /// </summary>
         public FlightStateModel FlightState { get; set; }
 
         public FlightStatusChangedEventArgs() { }

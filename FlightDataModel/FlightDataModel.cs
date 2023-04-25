@@ -20,27 +20,41 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FlightDataModel
 {
+    /// <summary>
+    /// Data definitions for the entities contained in Drone Navigator's database.
+    /// </summary>
     public class FlightDataContext : DbContext
     {
+        // These are each tables in the database; note that Commands was a planned feature but is not yet implemented.
         public DbSet<DroneModel> Drones { get; set; }
         public DbSet<MissionModel> Missions { get; set; }
         public DbSet<CommandModel> Commands { get; set; }
         public DbSet<FlightStateModel> FlightStates { get; set; }
 
+        // A string containing the absolute path to the database.
         public string DbPath { get; }
 
         public FlightDataContext()
         {
+            // We're using the LocalAppData path (usually C:\Users\<current user>\AppData\Local)
             string localAppDataPath = Path.Join(
                 Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "DroneNavigator");
+            // Create the directory and all parents if they do not yet exist; no action is taken if they already exist.
             Directory.CreateDirectory(localAppDataPath);
             DbPath = Path.Join(localAppDataPath, "DroneNavigator.db");
         }
 
+        // Tell EF Core:
+        // 1. We are using SQLite.
+        // 2. Where the SQLite database should be stored on disk.
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) =>
             optionsBuilder.UseSqlite($"Data Source={DbPath}");
     }
 
+    /// <summary>
+    /// The main data model for a Drone. Name, Make, and Model are user-entered fields, TotalFlightTime and
+    /// MissionCount are calculated.
+    /// </summary>
     public class DroneModel
     {
         public int Id { get; set; }
@@ -51,6 +65,10 @@ namespace FlightDataModel
         public int MissionCount { get; set; }
     }
 
+    /// <summary>
+    /// The main data model for a Mission; some fields (Drone, Name, Description) are user-entered, some
+    /// (StartDateTimeOffset, EndDateTimeOffset, Distance) are generated, some (Duration) are computed.
+    /// </summary>
     public class MissionModel
     {
         public int Id { get; set; }
@@ -71,6 +89,10 @@ namespace FlightDataModel
         }
     }
 
+    /// <summary>
+    /// The main data model for a Command.
+    /// NOTE: This exists in the database but is currently unused; a future improvement is planned.
+    /// </summary>
     public class CommandModel
     {
         public int Id { get; set; }
@@ -82,6 +104,9 @@ namespace FlightDataModel
         public bool ResponseWasError { get; set; }
     }
 
+    /// <summary>
+    /// The main data model for a FlightState, which are received from the drone during flight.
+    /// </summary>
     public class FlightStateModel
     {
         public int Id { get; set; }

@@ -1,8 +1,9 @@
 ﻿// ReplaySynchronizer
 // Synchronizes flight states as displayed in the CDI during mission review.
 // Timing and controls here are primarily driven by the MediaPlayerElement displaying the mission video, as its native
-// controls will be most familiar to the user. Additionally, simply keeping the flight data in sync with the video's
-// position ensures that seeking and playback rate changes will not cause desynchronization issues.
+// controls will be most familiar to the user. Additionally, the strategy of keeping the flight data in sync with the
+// video's position at any given moment ensures that seeking and playback rate changes will not cause desynchronization
+// issues.
 
 // By Nicholas De Nova
 // For CPSC-4900 Senior Project & Seminar
@@ -24,6 +25,13 @@ using Microsoft.UI.Xaml.Controls;
 
 namespace Review
 {
+    /// <summary>
+    /// Synchronizes flight states as displayed in the CDI during mission review.
+    /// Timing and controls here are primarily driven by the MediaPlayerElement displaying the mission video, as its
+    /// native controls will be most familiar to the user. Additionally, the strategy of keeping the flight data in
+    /// sync with the video's position at any given moment ensures that seeking and playback rate changes will not
+    /// cause desynchronization issues.
+    /// </summary>
     internal class ReplaySynchronizer : IFlightStatusProvider
     {
         public event IFlightStatusProvider.OnFlightStatusChangedHandler? OnFlightStatusChanged;
@@ -72,10 +80,16 @@ namespace Review
             _mpe.TransportControls.IsZoomEnabled = true;
             _mpe.TransportControls.IsZoomButtonVisible = true;
 
+            // Every 10ms, the timer will fire, and the CDI's data pane will be refreshed according to the mission
+            // video's position. This interval is quick enough to ensure that the perception of realtime status updates
+            // are maintained.
             _flightStatusTimer.Interval = TimeSpan.FromMilliseconds(10);
             _flightStatusTimer.Tick += FlightStatusTimerOnTick;
             _flightStatusTimer.Start();
 
+            // Load all FlightStates from the database, converting each to a tuple containing the mission ID and the
+            // MET field. This is done to reduce memory consumption, as we don't need to keep all FlightStates in RAM
+            // at all time.
             _metList = (
                 from state in _fdc.FlightStates.Where(
                     (state) => state.Mission == mission.Id)
@@ -85,12 +99,24 @@ namespace Review
 
         private void FlightStatusTimerOnTick(object? sender, object e)
         {
+            // This is the current position of the video being played back, measured as milliseconds elapsed since the
+            // beginning of the video.
             int curMillis = (int)_mpe.MediaPlayer.PlaybackSession.Position.TotalMilliseconds + _metOffset;
+
+            // This bit of magic returns the ID of the flight state with an MET field closest to the current video
+            // position. It is not guaranteed that a flight state record at the exact elapsed time of the video exists
+            // in the database, and gaps in the state recordings are possible and supported (network issues may cause
+            // a second or two of missing data from the drone), so the nearest flight state message is used.
             int closestStateId =
                 _metList.Aggregate((x, y) =>
                     Math.Abs(x.Item2 - curMillis) < Math.Abs(y.Item2 - curMillis) ? x : y)
                 .Item1; // The mission ID is Item1 in the tuple
+
+            // Now, look the actual flight state record up according to its ID.
+            // If that FlightState cannot be found, a blank FlightState is created to avoid crashing the UI with a null
+            // reference.
             FlightStateModel closestState = _fdc.FlightStates.Find(closestStateId) ?? new FlightStateModel();
+            // Invoke the event handler, which is hooked by the CDI to refresh the interface when it is called.
             OnFlightStatusChanged?.Invoke(this, new FlightStatusChangedEventArgs(closestState));
         }
     }

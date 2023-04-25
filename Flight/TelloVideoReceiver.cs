@@ -1,7 +1,6 @@
 ﻿// TelloVideoReceiver
-// The class that receives video from the Tello in real time and displays it in the CDI's MediaPlayerElement, which
-// ultimately provides a live view of the drone's camera to the pilot. This class also buffers video received from the
-// drone in memory for later transcoding.
+// Receives video from the Tello in real time and provides it to a MediaStreamSource. Also buffers all video received
+// from the drone, passing that buffer to whatever calls its Stop method. This is used for the transcoding process.
 
 // By Nicholas De Nova
 // For CPSC-4900 Senior Project & Seminar
@@ -30,6 +29,10 @@ using FlightDataModel;
 
 namespace Flight
 {
+    /// <summary>
+    /// Receives video from the Tello in real time and provides it to a MediaStreamSource. Also buffers all video
+    /// received from the drone, passing that buffer to whatever calls its <see cref="Stop"/> method.
+    /// </summary>
     internal class TelloVideoReceiver
     {
         private readonly UdpClient _telloVideoClient;
@@ -45,6 +48,9 @@ namespace Flight
         private readonly ConcurrentQueue<MediaStreamSample> _samples = new();
         private readonly ConcurrentQueue<MediaStreamSample> _encodeSamples = new();
 
+        /// <summary>
+        /// Standard video encoding settings for the Tello, 4Mbits/s bitrate, 960 pixels wide by 720 pixels tall.
+        /// </summary>
         public static VideoEncodingProperties TelloVideoEncodingProperties
         {
             get
@@ -68,6 +74,10 @@ namespace Flight
             _receiveThread = new Thread(SynchronousReceiveVideo);
         }
 
+        /// <summary>
+        /// Called by the MediaStreamSource when it is looking for a new video sample. Spins until a sample is placed
+        /// into the buffer.
+        /// </summary>
         private void MediaStreamSource_SampleRequested(MediaStreamSource sender, MediaStreamSourceSampleRequestedEventArgs args)
         {
             if (_samples.IsEmpty)
@@ -81,6 +91,10 @@ namespace Flight
             }
         }
 
+        /// <summary>
+        /// Shuts down the video receiving thread. The instance of TelloVideoReceiver should not be reused once this
+        /// method is called.
+        /// </summary>
         public void Quit()
         {
             _quitting.Cancel();
@@ -89,6 +103,10 @@ namespace Flight
             _telloVideoClient.Close();
         }
 
+        /// <summary>
+        /// The method executed by the background thread. Continuously receives video samples over the network and
+        /// places them into the <see cref="_samples"/> and <see cref="_encodeSamples"/> buffers.
+        /// </summary>
         public void SynchronousReceiveVideo()
         {
             _watch.Start();
@@ -98,27 +116,34 @@ namespace Flight
             FileStream videoTempStream = new(MissionVideoManager.TempVideoPath, FileMode.Create, FileAccess.Write);
             BinaryWriter videoTempWriter = new(videoTempStream);
 
+            // Check to make sure that we haven't been asked to quit.
             while(!_quitting.IsCancellationRequested)
             {
+                // Count up from when the thread was started; this is a continuously increasing timer to ensure that
+                // samples do not arrive jumbled.
                 TimeSpan timeIndex = this._watch.Elapsed;
                 try
                 {
                     byte[] buf = _telloVideoClient.Receive(ref _telloEndPoint);
+                    // If we haven't received any video (probably a receive timeout), do nothing
                     if (buf.Length == 0)
                     {
                         continue;
                     }
 
                     //VideoSample vs = new(timeIndex, _watch.Elapsed - timeIndex, buf);
+                    // Add the received sample to both the live buffer and the encoding buffer.
                     _samples.Enqueue(MediaStreamSample.CreateFromBuffer(buf.AsBuffer(), timeIndex));
                     _encodeSamples.Enqueue(MediaStreamSample.CreateFromBuffer(buf.AsBuffer(), timeIndex));
 
+                    // Write the received sample to the temporary file as well.
                     videoTempStream.Write(buf);
                 }
                 catch
                 {
                 }
             }
+            // Close the temporary file writer.
             videoTempWriter.Close();
             videoTempStream.Close();
         }
@@ -128,6 +153,10 @@ namespace Flight
             _receiveThread.Start();
         }
 
+        /// <summary>
+        /// Notifies the background thread to stop receiving video.
+        /// </summary>
+        /// <returns>All video samples received during execution.</returns>
         public ConcurrentQueue<MediaStreamSample> Stop()
         {
             _quitting.Cancel();

@@ -1,5 +1,6 @@
 ﻿// IFlightStatusProvider.cs
 // A generic interface for classes streaming flight status data updates via callbacks.
+
 // By Nicholas De Nova
 // For CPSC-4900 Senior Project & Seminar
 // With Professor Freddie Kato
@@ -21,7 +22,17 @@ namespace CDI
     /// </summary>
     public interface IFlightStatusProvider
     {
+        /// <summary>
+        /// A delegate to be called when the flight status that the implementing class holds changes.
+        /// </summary>
+        /// <param name="sender">The class where the change originated.</param>
+        /// <param name="e">
+        /// The <see cref="FlightStatusChangedEventArgs"/> containing the newly changed flight state model object.
+        /// </param>
         public delegate void OnFlightStatusChangedHandler(object sender, FlightStatusChangedEventArgs e);
+        /// <summary>
+        ///  The event that is fired when the flight state is changed.
+        /// </summary>
         public event OnFlightStatusChangedHandler OnFlightStatusChanged;
     }
 }

@@ -30,7 +30,9 @@ using FlightDataModel;
 namespace Review
 {
     /// <summary>
-    /// An empty window that can be used on its own or navigated to within a Frame.
+    /// The main window of the Review module, which contains a CDI control that is driven by previously saved mission
+    /// data and video, and enables media controls on the CDI's MediaPlayerElement for user interaction.
+    /// See <see cref="ReplaySynchronizer"/>.
     /// </summary>
     public sealed partial class MainWindow : Window
     {

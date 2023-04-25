@@ -37,7 +37,8 @@ using Microsoft.UI.Windowing;
 namespace Flight
 {
     /// <summary>
-    /// An empty window that can be used on its own or navigated to within a Frame.
+    /// A Page for embedding in a ContentDialog that triggers after a mission is complete, kicking off the mission
+    /// video transcoding process and displaying its progress.
     /// </summary>
     public sealed partial class MissionEncodingPage : Page
     {
@@ -50,6 +51,11 @@ namespace Flight
             this.InitializeComponent();
         }
 
+        /// <summary>
+        /// DEPRECATED: This event handler was used in an earlier version of the system that used FFMpeg to encode the
+        /// mission videos. This has since been dropped in favor of using the Windows.Media.Transcoding library.
+        /// </summary>
+        /// <param name="progress">The progress percentage reported by the FFMpeg process, ranging from 0-100.</param>
         private void FFMpegEncodingProgressChanged(double progress)
         {
             if(double.IsInfinity(progress)) {
@@ -61,6 +67,14 @@ namespace Flight
             });
         }
 
+        /// <summary>
+        /// Begins encoding the mission samples from <paramref name="queue"/> into a video, to be saved at
+        /// <paramref name="outPath"/>.
+        /// </summary>
+        /// <param name="queue">Video samples recorded from the drone during flight.</param>
+        /// <param name="vep">Properties (width, height, bitrate, etc) of the video represented by queue.</param>
+        /// <param name="outPath">The path where the transcoded video should be saved.</param>
+        /// <exception cref="Exception"></exception>
         public async void StartEncoding(ConcurrentQueue<MediaStreamSample> queue, VideoEncodingProperties vep, string outPath)
         {
             MediaEncodingProfile mep = MediaEncodingProfile.CreateMp4(VideoEncodingQuality.HD720p);
@@ -85,6 +99,8 @@ namespace Flight
             if(!pmsst.CanTranscode)
                 throw new Exception("Unable to transcode mission video");
 
+            // Begin transcoding.
+            // Hook an event handler for transcoding progress changes that will update the UI's progress indicators.
             var transcodeTask = pmsst.TranscodeAsync().AsTask(new Progress<double>((progress) => {
                 _dq.TryEnqueue(() => {
                     EncodingProgressBar.Value = progress;
@@ -92,10 +108,13 @@ namespace Flight
                 });
             }));
 
+            // Wait for the transcode task to complete.
             await transcodeTask;
+            // If it failed, throw an exception.
             if(!transcodeTask.IsCompletedSuccessfully)
                 throw new Exception("Failed to transcode the mission video");
 
+            // Notify our internal event handler that the encode completed.
             OnEncodeCompleted?.Invoke(this, EventArgs.Empty);
         }
     }

@@ -16,6 +16,9 @@ using Windows.Media.Core;
 
 namespace Flight
 {
+    /// <summary>
+    /// Holds individual samples of video data as they are received from the drone over the network.
+    /// </summary>
     internal class VideoSample
     {
         public TimeSpan Start;
