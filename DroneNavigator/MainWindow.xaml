@@ -1,5 +1,15 @@
-<!-- Copyright (c) Microsoft Corporation. All rights reserved. -->
-<!-- Licensed under the MIT License. See LICENSE in the project root for license information. -->
+<!--
+    MainWindow
+
+    The UI entry point for the Drone Navigator project. Provides drone and mission management controls, and ways to
+    start a new mission, or review a previously flown one.
+
+    By Nicholas De Nova
+    For CPSC-4900 Senior Project & Seminar
+    With Professor Freddie Kato
+    At Governors State University
+    In Spring 2023
+-->
 
 <Window
     x:Class="DroneNavigator.MainWindow"

@@ -1,5 +1,15 @@
-<!-- Copyright (c) Microsoft Corporation and Contributors. -->
-<!-- Licensed under the MIT License. -->
+<!--
+    MissionEncodingPage
+
+    A Page for embedding in a ContentDialog that triggers after a mission is complete, kicking off the mission video
+    transcoding process and displaying its progress.
+
+    By Nicholas De Nova
+    For CPSC-4900 Senior Project & Seminar
+    With Professor Freddie Kato
+    At Governors State University
+    In Spring 2023
+-->
 
 <Page
     x:Class="Flight.MissionEncodingPage"

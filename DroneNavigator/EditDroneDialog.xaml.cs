@@ -1,6 +1,6 @@
 // EditDroneDialog
 // A dialog that presents a simple interface for modifying properties of a given drone in the database.
-// This dialog is also used when creating a drone.
+// This dialog is also used when adding a new drone to the system.
 
 // By Nicholas De Nova
 // For CPSC-4900 Senior Project & Seminar
