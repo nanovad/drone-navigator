@@ -84,7 +84,7 @@ namespace DroneNavigator
 
             // Calculate the cumulative time flown by this drone during all its missions.
             TimeSpan cumulative = TimeSpan.Zero;
-            dronesMissions.ForEach(m => cumulative.Add(m.Duration));
+            dronesMissions.ForEach(m => cumulative = cumulative.Add(m.Duration));
             ds.CumulativeTimeFlown = cumulative;
 
             return ds;

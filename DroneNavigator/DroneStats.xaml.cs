@@ -75,7 +75,7 @@ namespace DroneNavigator
             // Format the strings nicely.
             MaxBarometricAltitude.Text = $"{dsvm.MaxAltitudeFlown:F1}cm";
             AverageTimeFlownTextBlock.Text = dsvm?.AverageTimeFlown.ToString("hh\\:mm\\:ss\\.fff") ?? "";
-            CumulativeTimeFlownTextBlock.Text = dsvm?.AverageTimeFlown.ToString("dd\\:hh\\:mm\\:ss") ?? "";
+            CumulativeTimeFlownTextBlock.Text = dsvm?.CumulativeTimeFlown.ToString("dd\\:hh\\:mm\\:ss") ?? "";
 
             // Hide the ProgressRing that indicates to the user that work is ongoing.
             LoadingProgressRing.Visibility = Visibility.Collapsed;
