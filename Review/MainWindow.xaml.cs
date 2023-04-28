@@ -42,6 +42,8 @@ namespace Review
         public MainWindow()
         {
             this.InitializeComponent();
+
+            Title = "Drone Navigator - Review";
         }
 
         public void Initialize(MissionModel mission)

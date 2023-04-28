@@ -47,6 +47,7 @@ namespace DroneNavigator
         protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
         {
             Window = new MainWindow();
+            Window.Title = "Drone Navigator - Main";
             Window.Activate();
         }
 
