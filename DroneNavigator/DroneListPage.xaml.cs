@@ -91,6 +91,7 @@ namespace DroneNavigator
 
             // Spawn the EditDroneDialog prefilled with data from the drone.
             EditDroneDialog edd = new();
+            edd.Title = "Edit drone";
             edd.XamlRoot = this.Content.XamlRoot;
             edd.Prefill = whichDrone;
 
