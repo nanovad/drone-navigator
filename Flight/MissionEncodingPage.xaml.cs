@@ -28,8 +28,6 @@ using Windows.Media.Core;
 using Windows.Media.MediaProperties;
 using Windows.Media.Transcoding;
 using Windows.Storage.Streams;
-using FFMpegCore;
-using FFMpegCore.Enums;
 using FlightDataModel;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Windowing;

@@ -50,11 +50,7 @@ namespace Review
             string missionVideoPath = MissionVideoManager.GetMissionVideoPath(mission);
 
             // BUG: We are not able to correctly determine the offset of the video vs the state logs here.
-            TimeSpan videoDuration = FFMpegCore.FFProbe.Analyse(missionVideoPath).Duration;
-            TimeSpan missionDuration = mission.EndDateTimeOffset - mission.StartDateTimeOffset;
-            DateTimeOffset videoStartDateTime = mission.EndDateTimeOffset - videoDuration;
-            _metOffset = (int)(mission.StartDateTimeOffset - videoStartDateTime).TotalMilliseconds;
-            _metOffset = (int)(missionDuration - videoDuration).TotalMilliseconds;
+            // Set the offset to 0. See Known Issues #6 in the System Documentation document.
             _metOffset = 0;
 
             _mpe = mpe;
