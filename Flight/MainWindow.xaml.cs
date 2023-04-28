@@ -61,6 +61,8 @@ namespace Flight
         // Fired when transcoding has completed and the Flight module is exiting.
         public event EventHandler? FlightFinished;
 
+        private ConcurrentQueue<MediaStreamSample>? _previousSamples;
+
         public MainWindow()
         {
             this.InitializeComponent();
@@ -143,7 +145,7 @@ namespace Flight
             // If we are currently connected, this button turns into a disconnect button, so take that action instead.
             if(api != null && api.Connected)
             {
-                Cleanup();
+                _previousSamples = Cleanup();
                 return;
             }
 
@@ -214,7 +216,11 @@ namespace Flight
                     api.StartVideo();
                     _missionVideoToEncode = true;
 
-                    _dq.TryEnqueue(() => {
+                    _dq.TryEnqueue(() =>
+                    {
+                        // _previousSamples should be null while we're connected.
+                        _previousSamples = null;
+
                         // If StartConnection() does not throw an exception, we can assume the connection succeeded.
                         ConnectButton.Content = "Disconnect"; 
                         ConnectButton.IsEnabled = true;
@@ -233,6 +239,7 @@ namespace Flight
                     // InfoBar.
                     _dq.TryEnqueue(() =>
                     {
+                        // No need to save samples here, as none have been recorded if the connection fails.
                         Cleanup();
                         ConnectionFailedInfoBar.IsOpen = true;
                         BadControllerInfoBar.IsOpen = false;
@@ -266,6 +273,13 @@ namespace Flight
 
             // Perform shutdown of all background tasks, threads, and connections.
             var queue = Cleanup();
+
+            // Occurs when the user already clicked the Disconnect button (which retrieves the video samples) before
+            // clicking the close button. If that's the case, the call to Cleanup just before this would return no
+            // samples.
+            if (_previousSamples != null)
+                queue = _previousSamples;
+
             // At this point, we have a mission video that needs to be encoded.
 
             // Prevent the window from automatically closing.
@@ -287,9 +301,6 @@ namespace Flight
 
             // Ensure our local app data folder (and video subfolder) is created.
             Directory.CreateDirectory(MissionVideoManager.BaseVideoFolderPath);
-
-            if (!File.Exists(MissionVideoManager.TempVideoPath))
-                throw new FileNotFoundException("Unable to find mission video file");
 
             if (_missionVideoToEncode && !queue.IsEmpty)
             {
