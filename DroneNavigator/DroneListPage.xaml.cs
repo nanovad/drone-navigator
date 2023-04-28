@@ -102,32 +102,6 @@ namespace DroneNavigator
         }
 
         /// <summary>
-        /// Event handler for each drone's "Delete" button click.
-        /// NOTE: This button is hidden and disabled in the UI, as it would violate referential integrity.
-        /// </summary>
-        private async void DeleteDroneButton_Click(object sender, RoutedEventArgs e)
-        {
-            DroneModel whichDrone = (e.OriginalSource as Button).DataContext as DroneModel;
-
-            ContentDialog cd = new();
-            cd.XamlRoot = this.Content.XamlRoot;
-            cd.Title = "Delete drone?";
-            cd.Content = $"Are you sure you want to delete the drone \"{whichDrone.Name}\"?";
-            cd.PrimaryButtonText = "Delete";
-            cd.SecondaryButtonText = "Cancel";
-
-            ContentDialogResult res = await cd.ShowAsync();
-
-            if(res == ContentDialogResult.Primary) {
-                // TODO: We cannot simply remove the drone, as this will violate referential integrity.
-                // We have to add a parameter to it to mark it as deleted.
-                fdc.Remove(whichDrone);
-                fdc.SaveChanges();
-                RefreshList();
-            }
-        }
-
-        /// <summary>
         /// Event handler for each drone's analytics button click.
         /// Spawns a DroneStats dialog which shows information about the selected drone.
         /// </summary>

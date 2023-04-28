@@ -74,7 +74,6 @@
         <!-- Panel below the mission list -->
         <Border Grid.Row="1" BorderBrush="Silver" CornerRadius="8" Padding="5" BorderThickness="1" Margin="10">
         <RelativePanel x:Name="CommandButtonRow" Margin="10">
-                <TextBox x:Name="SearchForMissionTextBox" PlaceholderText="Search..." MinWidth="300" RelativePanel.AlignLeftWithPanel="True"></TextBox>
                 <Button x:Name="StartNewMissionButton" RelativePanel.AlignRightWithPanel="True" Content="Start New Mission" Click="StartNewMissionButton_OnClick" />
             </RelativePanel>
         </Border>

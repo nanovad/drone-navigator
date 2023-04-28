@@ -54,14 +54,11 @@
                                 <Run Text="{x:Bind MissionCount}" />
                             </Paragraph>
                         </RichTextBlock>
-                        <Button x:Name="AnalyticsButton" Grid.Column="1" Margin="16, 0, 8, 0" Click="AnalyticsButton_OnClick">
+                        <Button x:Name="AnalyticsButton" Grid.Column="2" Margin="16, 0, 8, 0" Click="AnalyticsButton_OnClick">
                             <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE7B8;" />
                         </Button>
-                        <Button x:Name="EditDroneButton" Grid.Column="2" Margin="8,0,8,0" Click="EditDroneButton_Click">
+                        <Button x:Name="EditDroneButton" Grid.Column="3" Margin="8,0,32,0" Click="EditDroneButton_Click">
                             <SymbolIcon Symbol="Edit" />
-                        </Button>
-                        <Button x:Name="DeleteDroneButton" Grid.Column="3" Margin="8,0,32,0" Click="DeleteDroneButton_Click">
-                            <SymbolIcon Symbol="Delete" />
                         </Button>
                     </Grid>
                 </DataTemplate>
