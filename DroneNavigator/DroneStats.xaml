@@ -32,6 +32,8 @@
                 <RowDefinition>Auto</RowDefinition>
                 <RowDefinition>Auto</RowDefinition>
                 <RowDefinition>Auto</RowDefinition>
+                <RowDefinition>Auto</RowDefinition>
+                <RowDefinition>Auto</RowDefinition>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition>Auto</ColumnDefinition>
@@ -46,6 +48,12 @@
 
             <TextBlock Grid.Column="0" Grid.Row="2" Text="Cumulative time flown: " Margin="8" />
             <TextBlock x:Name="CumulativeTimeFlownTextBlock" Grid.Column="1" Grid.Row="2" Text="" Margin="8" />
+
+            <TextBlock Grid.Column="0" Grid.Row="3" Text="Number of missions flown: " Margin="8" />
+            <TextBlock x:Name="MissionsFlownTextBlock" Grid.Column="1" Grid.Row="3" Text="" Margin="8" />
+
+            <TextBlock Grid.Column="0" Grid.Row="4" Text="Furthest distance from controller: " Margin="8" />
+            <TextBlock x:Name="FurthestDistanceFromControllerTextBlock" Grid.Column="1" Grid.Row="4" Text="" Margin="8" />
         </Grid>
     </StackPanel>
 </Page>

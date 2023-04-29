@@ -36,6 +36,14 @@ namespace DroneNavigator
         /// The cumulative time this drone has spent flying missions.
         /// </summary>
         public TimeSpan CumulativeTimeFlown { get; private set; }
+        /// <summary>
+        /// The number of missions this drone has flown.
+        /// </summary>
+        public int TotalMissionsFlown { get; private set; }
+        /// <summary>
+        /// The furthest distance from the controller this drone has ever been.
+        /// </summary>
+        public float FurthestDistanceFromController { get; private set; }
 
         private DroneStatsViewModel()
         {
@@ -69,7 +77,7 @@ namespace DroneNavigator
                 dronesMissions.Average(m => m.Duration.TotalSeconds));
 
             // Calculate highest barometric altitude.
-            // For every missions...
+            // For every mission...
             foreach(MissionModel m in dronesMissions) {
                 // Select all flight states for this mission
                 var relFlightStates = await c.FlightStates.Where(f => f.Mission == m.Id).ToListAsync();
@@ -86,6 +94,24 @@ namespace DroneNavigator
             TimeSpan cumulative = TimeSpan.Zero;
             dronesMissions.ForEach(m => cumulative = cumulative.Add(m.Duration));
             ds.CumulativeTimeFlown = cumulative;
+
+            // Set the number of missions this drone has flown.
+            ds.TotalMissionsFlown = dronesMissions.Count;
+
+            // Calculate the furthest distance the drone flew during any mission.
+            // For every mission...
+            foreach (MissionModel m in dronesMissions)
+            {
+                // Select all flight states for this mission
+                var relFlightStates = await c.FlightStates.Where(f => f.Mission == m.Id).ToListAsync();
+                // If there are no flight states for this mission (a mission that never connected to the drone), skip.
+                if(relFlightStates.Any()) {
+                    // Calculate the maximum distance the drone flew from the controller during this mission.
+                    var maxDist = relFlightStates.Max(t => t.TotalDistance);
+                    // The maximum distance is the higher value from of any of the other missions, or this mission.
+                    ds.FurthestDistanceFromController = Math.Max(ds.FurthestDistanceFromController, maxDist);
+                }
+            }
 
             return ds;
         }

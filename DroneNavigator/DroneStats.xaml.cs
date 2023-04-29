@@ -88,6 +88,9 @@ namespace DroneNavigator
             MaxBarometricAltitude.Text = $"{dsvm.MaxAltitudeFlown:F1}cm";
             AverageTimeFlownTextBlock.Text = dsvm?.AverageTimeFlown.ToString("hh\\:mm\\:ss\\.fff") ?? "";
             CumulativeTimeFlownTextBlock.Text = dsvm?.CumulativeTimeFlown.ToString("dd\\:hh\\:mm\\:ss") ?? "";
+            MissionsFlownTextBlock.Text = $"{dsvm?.TotalMissionsFlown:D}";
+            // This magic number is the conversion factor from cm to ft.
+            FurthestDistanceFromControllerTextBlock.Text = $"{dsvm?.FurthestDistanceFromController * 0.0328084:F1}ft";
 
             // Hide the ProgressRing that indicates to the user that work is ongoing.
             LoadingProgressRing.Visibility = Visibility.Collapsed;
