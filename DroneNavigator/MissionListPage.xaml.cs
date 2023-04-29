@@ -75,11 +75,35 @@ namespace DroneNavigator
         /// Event handler for the "Replay" button click.
         /// Launches the Review module and passes it the currently selected mission.
         /// </summary>
-        private void ReplayMissionButton_OnClick(object sender, RoutedEventArgs e)
+        private async void ReplayMissionButton_OnClick(object sender, RoutedEventArgs e)
         {
             // Get the MissionModel that this ListItem is representing.
             FrameworkElement el = (FrameworkElement)sender;
             MissionModel selectedMission = (MissionModel)el.DataContext;
+
+            List<string> errors = new();
+            // Check to ensure that the mission video exists and that there are flight state records for this mission.
+            if(!File.Exists(MissionVideoManager.GetMissionVideoPath(selectedMission)))
+                errors.Add("Mission video not found");
+            if(!fdc.FlightStates.Any(s => s.Mission == selectedMission.Id))
+                errors.Add("No flight data available for mission (was the Flight window closed before connecting to the drone?)");
+
+            if (errors.Count > 0)
+            {
+                ContentDialog errorDialog = new ContentDialog();
+                errorDialog.XamlRoot = Content.XamlRoot;
+                errorDialog.Title = $"Error{(errors.Count > 1 ? "s" : "")} while launching Review";
+                errorDialog.Content = new TextBlock()
+                {
+                    Margin = new Thickness(8, 32, 8, 16),
+                    Text = string.Join("\n\n", errors),
+                    FontSize = 16,
+                    TextWrapping = TextWrapping.WrapWholeWords
+                };
+                errorDialog.CloseButtonText = "Okay";
+                await errorDialog.ShowAsync();
+                return;
+            }
 
             // Spawn the Review main window with this ListItem's mission.
             Review.MainWindow reviewWindow = new();
