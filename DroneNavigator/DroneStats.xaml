@@ -24,6 +24,7 @@
     <StackPanel>
 
         <ProgressRing x:Name="LoadingProgressRing" IsActive="True" />
+        <TextBlock x:Name="ErrorTextBlock" FontSize="16" Visibility="Collapsed" HorizontalAlignment="Center" HorizontalTextAlignment="Center" />
 
         <!-- Grid that contains the real analysis, initially collapsed to allow the loading spinner to show. -->
         <Grid x:Name="MainGrid" Visibility="Collapsed">

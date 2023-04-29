@@ -23,6 +23,7 @@ using Windows.Foundation;
 using Windows.Foundation.Collections;
 using ABI.Microsoft.Web.WebView2.Core;
 using FlightDataModel;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.UI.Dispatching;
 namespace DroneNavigator
 {
@@ -68,6 +69,17 @@ namespace DroneNavigator
             // Note that the text boxes here are not yet visible because the MainGrid containing them is initialized
             // from XAML with their Visibility property set to Collapsed.
             // Instead, only a ProgresssRing is shown, which must be hidden when the calculation completes.
+
+            // Ensure this drown has flown missions before attempting to calculate stats.
+            if(!_fdc.Missions.Any(m => m.Drone == _droneId))
+            {
+                ErrorTextBlock.Text =
+                    "No missions have been flown with this drone yet.\n" +
+                    "Please fly at least one mission before viewing statistics.";
+                LoadingProgressRing.Visibility = Visibility.Collapsed;
+                ErrorTextBlock.Visibility = Visibility.Visible;
+                return;
+            }
             
             // Actually perform calculation of the stats from the DB.
             dsvm = await DroneStatsViewModel.Calculate(_fdc, _droneId);
