@@ -46,13 +46,6 @@
                                 <Run Text="{x:Bind Make}" FontSize="16" FontStyle="Italic" />
                                 <Run Text="{x:Bind Model}" FontSize="16" FontStyle="Italic" />
                             </Paragraph>
-                            <Paragraph FontWeight="SemiBold" Margin="16,0,0,0">
-                                <Run Text="Cumulative flight duration: " />
-                                <Run Text="{x:Bind TotalFlightTime}" FontWeight="Normal"/>
-                                <LineBreak />
-                                <Run Text="Mission count: " />
-                                <Run Text="{x:Bind MissionCount}" />
-                            </Paragraph>
                         </RichTextBlock>
                         <Button x:Name="AnalyticsButton" Grid.Column="2" Margin="16, 0, 8, 0" Click="AnalyticsButton_OnClick">
                             <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE7B8;" />
