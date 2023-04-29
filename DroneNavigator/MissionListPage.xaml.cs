@@ -179,20 +179,35 @@ namespace DroneNavigator
                 // Begin initializing a new Flight window
                 Flight.MainWindow flightWindow = new();
                 flightWindow.Mission = newMission;
-                // Close our window - we're about to swap to the Flight interface
-                (Application.Current as App)?.Window.Close();
+
+                // Create a ContentDialog that serves to block user input while the flight is ongoing.
+                ContentDialog flyingPopoverDialog = new()
+                {
+                    Title = "Waiting for Flight to finish...",
+                    Content = new TextBlock() {
+                        Text = "Please complete the flight using the Flight module.\n"
+                             + "When the flight ends, this dialog box will close.",
+                        TextWrapping = TextWrapping.WrapWholeWords
+                    },
+                    XamlRoot = Content.XamlRoot
+                };
 
                 // Show the Flight window.
                 flightWindow.Activate();
                 flightWindow.FlightFinished += delegate
                 {
-                    // When the Flight completes (after transcocding), respawn the main window.
-                    MainWindow newMain = new();
-                    newMain.Activate();
-                    // Necessary for subsequent Flight module starts; we want to reparent the app to the new
-                    // MainWindow instance.
-                    (Application.Current as App)!.Window = newMain;
+                    // When the flight completes, hide the ContentDialog that will be blocking user input in the Main
+                    // module's UI.
+                    flyingPopoverDialog.Hide();
                 };
+
+                // Show the input-blocking ContentDialog. This will be hidden (closed) when the FlightFinished event
+                // handler fires, after mission video transcoding at the end of the mission.
+                await flyingPopoverDialog.ShowAsync();
+
+                // Refresh the mission list from the database before handing control back to the user. This refresh
+                // ensures that the mission that was just flown appears in the list.
+                this.Loaded();
             }
         }
     }
