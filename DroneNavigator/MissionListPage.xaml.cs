@@ -58,6 +58,16 @@ namespace DroneNavigator
         {
             List<MissionModel> sourceList = await fdc.Missions.ToListAsync();
             MissionListView.ItemsSource = sourceList.OrderByDescending(mission => mission.StartDateTimeOffset);
+            if (sourceList.Count > 0)
+            {
+                NoMissionsTextBlock.Visibility = Visibility.Collapsed;
+                MissionListView.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                NoMissionsTextBlock.Visibility = Visibility.Visible;
+                MissionListView.Visibility = Visibility.Collapsed;
+            }
         }
 
         /// <summary>

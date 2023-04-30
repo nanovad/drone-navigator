@@ -29,34 +29,42 @@
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <ListView x:Name="DronesListView" Grid.Row="0">
-            <ListView.ItemTemplate>
-                <DataTemplate x:DataType="flightDataModel:DroneModel" xmlns:xaml="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
-                    <Grid Background="{xaml:ThemeResource SystemColorWindowColor}" Margin="8" CornerRadius="4">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-                        <RichTextBlock Grid.Column="0" IsTextSelectionEnabled="False" Margin="16">
-                            <Paragraph>
-                                <Run Text="{x:Bind Name}" FontSize="20" FontWeight="Bold" />
-                                <Run Text=" - " />
-                                <Run Text="{x:Bind Make}" FontSize="16" FontStyle="Italic" />
-                                <Run Text="{x:Bind Model}" FontSize="16" FontStyle="Italic" />
-                            </Paragraph>
-                        </RichTextBlock>
-                        <Button x:Name="AnalyticsButton" Grid.Column="2" Margin="16, 0, 8, 0" Click="AnalyticsButton_OnClick">
-                            <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE7B8;" />
-                        </Button>
-                        <Button x:Name="EditDroneButton" Grid.Column="3" Margin="8,0,32,0" Click="EditDroneButton_Click">
-                            <SymbolIcon Symbol="Edit" />
-                        </Button>
-                    </Grid>
-                </DataTemplate>
-            </ListView.ItemTemplate>
-        </ListView>
+
+        <StackPanel Grid.Row="0">
+            <TextBlock x:Name="NoDronesTextBlock" FontSize="16" Margin="32" TextWrapping="Wrap" Visibility="Visible" FontStyle="Italic" HorizontalAlignment="Center" TextAlignment="Center">
+                No drones have been added yet! Once you add a drone, it will show up here.
+            </TextBlock>
+
+            <ListView x:Name="DronesListView" Visibility="Collapsed">
+                <ListView.ItemTemplate>
+                    <DataTemplate x:DataType="flightDataModel:DroneModel" xmlns:xaml="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+                        <Grid Background="{xaml:ThemeResource SystemColorWindowColor}" Margin="8" CornerRadius="4">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <RichTextBlock Grid.Column="0" IsTextSelectionEnabled="False" Margin="16">
+                                <Paragraph>
+                                    <Run Text="{x:Bind Name}" FontSize="20" FontWeight="SemiBold" />
+                                    <Run Text=" - " />
+                                    <Run Text="{x:Bind Make}" FontSize="16" FontStyle="Italic" />
+                                    <Run Text="{x:Bind Model}" FontSize="16" FontStyle="Italic" />
+                                </Paragraph>
+                            </RichTextBlock>
+                            <Button x:Name="AnalyticsButton" Grid.Column="2" Margin="16, 0, 8, 0" Click="AnalyticsButton_OnClick">
+                                <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE7B8;" />
+                            </Button>
+                            <Button x:Name="EditDroneButton" Grid.Column="3" Margin="8,0,32,0" Click="EditDroneButton_Click">
+                                <SymbolIcon Symbol="Edit" />
+                            </Button>
+                        </Grid>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </StackPanel>
+
         <Border Grid.Row="1" BorderBrush="Silver" CornerRadius="8" Padding="5" BorderThickness="1" Margin="10">
             <RelativePanel x:Name="CommandButtonRow" Margin="8">
                 <Button x:Name="NewDroneButton" RelativePanel.AlignRightWithPanel="True" Click="NewDroneButton_Click">

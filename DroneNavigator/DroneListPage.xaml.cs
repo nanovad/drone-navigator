@@ -55,11 +55,21 @@ namespace DroneNavigator
         /// Refreshes the ListItem, which is the main component of this page, with a fresh list of drones received from
         /// the database.
         /// </summary>
-        private void RefreshList()
+        private async void RefreshList()
         {
-            fdc.Drones.ToListAsync().ContinueWith(
-                (items) => _dq.TryEnqueue(
-                    () => DronesListView.ItemsSource = items.Result));
+            List<DroneModel> drones = await fdc.Drones.ToListAsync();
+            _dq.TryEnqueue(() => DronesListView.ItemsSource = drones);
+
+            if (drones.Count > 0)
+            {
+                NoDronesTextBlock.Visibility = Visibility.Collapsed;
+                DronesListView.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                NoDronesTextBlock.Visibility = Visibility.Visible;
+                DronesListView.Visibility = Visibility.Collapsed;
+            }
         }
 
         /// <summary>
