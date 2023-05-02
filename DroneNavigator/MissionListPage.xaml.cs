@@ -206,6 +206,10 @@ namespace DroneNavigator
                 flightWindow.Activate();
                 flightWindow.FlightFinished += delegate
                 {
+                    // Refresh the mission list from the database before handing control back to the user. This refresh
+                    // ensures that the mission that was just flown appears in the list.
+                    this.Loaded();
+
                     // When the flight completes, hide the ContentDialog that will be blocking user input in the Main
                     // module's UI.
                     flyingPopoverDialog.Hide();
@@ -214,10 +218,6 @@ namespace DroneNavigator
                 // Show the input-blocking ContentDialog. This will be hidden (closed) when the FlightFinished event
                 // handler fires, after mission video transcoding at the end of the mission.
                 await flyingPopoverDialog.ShowAsync();
-
-                // Refresh the mission list from the database before handing control back to the user. This refresh
-                // ensures that the mission that was just flown appears in the list.
-                this.Loaded();
             }
         }
     }

@@ -293,8 +293,11 @@ namespace Flight
             mep.OnEncodeCompleted += (sender, args) => {
                 _missionVideoEncoded = true;
                 _dq.TryEnqueue(() => {
-                    mepd.Hide();
                     OnMissionVideoEncodingCompleted?.Invoke(this, EventArgs.Empty);
+                    // Notify the Main module that the flight has finished.
+                    // The handler attached to this will close the input-blocking dialog.
+                    FlightFinished?.Invoke(this, EventArgs.Empty);
+                    // Close the Flight window.
                     this.Close();
                 });
             };
