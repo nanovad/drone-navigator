@@ -70,7 +70,6 @@ namespace Flight
             Title = "Drone Navigator - Flight";
 
             Cdi.DroneVideoElement.AutoPlay = true;
-            Cdi.DroneVideoElement.MediaPlayer.RealTimePlayback = true;
             Cdi.DroneVideoElement.MediaPlayer.PlaybackSession.PositionChanged += delegate
             {
                 if (!_videoBegan)

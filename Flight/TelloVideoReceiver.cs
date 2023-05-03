@@ -70,6 +70,9 @@ namespace Flight
             _telloVideoClient.Client.ReceiveTimeout = 1000;
 
             MediaStreamSource = new MediaStreamSource(new VideoStreamDescriptor(TelloVideoEncodingProperties));
+            MediaStreamSource.BufferTime = TimeSpan.Zero;
+            MediaStreamSource.Duration = TimeSpan.Zero;
+            MediaStreamSource.CanSeek = false;
             MediaStreamSource.SampleRequested += MediaStreamSource_SampleRequested;
             _receiveThread = new Thread(SynchronousReceiveVideo);
         }
